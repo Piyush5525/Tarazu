@@ -12,7 +12,7 @@ import { reconcile, type LedgerEvent } from "@/lib/ledger/engine";
 import { KARIGARS } from "@/lib/ledger/seed";
 import { fineMg, grams, pct, rupees } from "@/lib/ledger/units";
 import { useStore, type Lang } from "@/lib/store";
-import { canListen, listen, readIssue, speak } from "@/lib/voice";
+import { canListen, listen, NO_WORDS, readIssue, speak, YES_WORDS } from "@/lib/voice";
 
 const SAMPLE: L = { en: "Today I got 250 gram 22 carat gold from Mehta ji, for the haar", hi: "आज 250 ग्राम 22 कैरेट सोना मिला मेहता जी से, हार के लिए", bn: "আজ ২৫০ গ্রাম ২২ ক্যারেট সোনা পেলাম মেহতা জির কাছ থেকে, হারের জন্য" };
 
@@ -60,7 +60,23 @@ function VoiceCapture() {
     return open.find((j) => reconcile(j, chain).issuedFine === 0) ?? open[open.length - 1];
   }, [jobs, me, chain]);
 
-  const bot = (text: string, extra?: Partial<Bubble>) => { setChat((c) => [...c, { from: "bot", text, ...extra }]); speak(text, lang); };
+  // After the read-back, he can simply SAY yes or no. The buttons stay for anyone who prefers to tap.
+  const [hearYN, setHearYN] = useState(false);
+  const stopYN = useRef<() => void>(() => {});
+  const answerLast = useRef<(yes: boolean) => void>(() => {});
+  const bot = (text: string, extra?: Partial<Bubble>) => {
+    setChat((c) => [...c, { from: "bot", text, ...extra }]);
+    speak(text, lang, () => {
+      if (!extra?.draft || !canListen()) return;
+      let last = "";
+      setHearYN(true);
+      stopYN.current = listen(lang, (x) => { last = x; }, () => {
+        setHearYN(false);
+        if (NO_WORDS.test(last)) answerLast.current(false);
+        else if (YES_WORDS.test(last)) answerLast.current(true);
+      });
+    });
+  };
 
   const heard = (text: string) => {
     setChat((c) => [...c, { from: "me", text }]);
@@ -86,12 +102,18 @@ function VoiceCapture() {
   };
 
   const answer = (i: number, yes: boolean) => {
-    const d = chat[i].draft!;
+    const d = chat[i]?.draft;
+    if (!d) return;
+    stopYN.current(); setHearYN(false);
+    try { navigator.vibrate?.(yes ? 60 : [40, 60, 40]); } catch {}
     setChat((c) => c.map((b, k) => (k === i ? { ...b, draft: undefined } : b)));
     if (!yes) return bot(t({ en: "Okay, nothing was saved. Press the microphone and say it again.", hi: "ठीक है, कुछ भी नहीं लिखा गया। माइक दबाकर दोबारा बोलो।", bn: "ঠিক আছে, কিছুই লেখা হয়নি। মাইক টিপে আবার বলো।" }));
     propose("ISSUE", d.jobId, me, { netMg: d.netMg, purityBp: d.purityBp }, "karigar");
     bot(t({ en: "Done. You have signed. Now it goes to Mehta ji for his signature. It becomes final only after he signs.", hi: "हो गया। तुम्हारे दस्तख़त हो गए। अब यह मेहता जी के पास उनके दस्तख़त के लिए गया है। उनके दस्तख़त के बाद ही पक्का होगा।", bn: "হয়ে গেছে। তোমার সই হলো। এখন এটা মেহতা জির কাছে গেছে তাঁর সইয়ের জন্য। তিনি সই করলে তবেই পাকা হবে।" }), { tick: 1 });
   };
+
+  answerLast.current = (yes) => { const i = chat.findLastIndex((b) => !!b.draft); if (i >= 0) answer(i, yes); };
+  useEffect(() => () => stopYN.current(), []);
 
   return (
     <section data-tara="mic" className="card overflow-hidden">
@@ -113,6 +135,10 @@ function VoiceCapture() {
                     <div className="text-sm font-semibold text-ink-2">{b.draft.purityBp === 9160 ? "22K" : b.draft.purityBp === 7500 ? "18K" : b.draft.purityBp === 9999 ? "24K" : "14K"} · {b.draft.jobId}</div>
                   </div>
                   <YesNo onYes={() => answer(i, true)} onNo={() => answer(i, false)} />
+                  <div className={`mt-2 flex items-center justify-center gap-2 text-sm font-bold ${hearYN ? "text-verdigris" : "text-ink-3"}`}>
+                    {hearYN ? <span className="wave scale-75"><i /><i /><i /></span> : <Mic size={15} />}
+                    {t({ en: "or just say: yes / no", hi: "या बस बोल दो: हाँ / ना", bn: "বা শুধু বলো: হ্যাঁ / না" })}
+                  </div>
                 </>
               )}
             </div>
@@ -225,10 +251,11 @@ function Book() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <span className="text-sm font-bold text-ink-3">{t({ en: "Demo: viewing as", hi: "डेमो: किसका खाता", bn: "ডেমো: কার খাতা" })}</span>
-        {KARIGARS.map((k) => <button key={k.id} onClick={() => setMe(k.id)} className={`min-h-11 rounded-full px-4 text-sm font-bold ${me === k.id ? "bg-ink text-ivory" : "border border-line bg-white/70"}`}>{k.name.split(" ")[0]}</button>)}
-        <span className="chip chip-ok ml-auto"><ShieldCheck size={14} />{t({ en: "Only your own account", hi: "सिर्फ़ तुम्हारा अपना खाता", bn: "শুধু তোমার নিজের খাতা" })}</span>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+        <div className="flex items-center gap-1 rounded-full border border-line bg-white/70 p-1" role="group" aria-label={t({ en: "Demo: viewing as", hi: "डेमो: किसका खाता", bn: "ডেমো: কার খাতা" })}>
+          {KARIGARS.map((k) => <button key={k.id} onClick={() => setMe(k.id)} className={`min-h-10 rounded-full px-4 text-sm font-bold ${me === k.id ? "bg-ink text-ivory" : "text-ink-2"}`}>{k.name.split(" ")[0]}</button>)}
+        </div>
+        <span className="chip chip-ok"><ShieldCheck size={14} />{t({ en: "Only your own account", hi: "सिर्फ़ तुम्हारा अपना खाता", bn: "শুধু তোমার নিজের খাতা" })}</span>
       </div>
 
       <h1 className="text-3xl font-semibold sm:text-4xl">{t({ en: "Hello", hi: "नमस्ते", bn: "নমস্কার" })}, <span className="gold-text">{lang === "en" ? f.who.name.split(" ")[0] : f.who.nameLocal.split(" ")[0]}</span></h1>
@@ -242,7 +269,12 @@ function Book() {
       <div className="mt-5 grid gap-5 lg:grid-cols-2">
         <section data-tara="gold" className="card overflow-hidden p-5">
           <div className="text-lg font-bold text-ink-2">{t({ en: "Gold with you now", hi: "अभी तुम्हारे पास सोना", bn: "এখন তোমার কাছে সোনা" })}</div>
-          <Grams mg={f.holdingMg} className="gold-text text-6xl font-bold sm:text-7xl" />
+          <Grams mg={f.holdingMg} className="gold-text block text-[3.4rem] font-bold leading-none sm:text-7xl" />
+          {/* the same amount as a picture: one coin = 10 grams */}
+          <div className="mt-3 flex flex-wrap items-center gap-1" aria-hidden>
+            {Array.from({ length: Math.min(Math.floor(f.holdingMg / 10_000), 30) }, (_, k) => <span key={k} className="gold-fill h-4 w-4 rounded-full shadow-[inset_-1px_-2px_2px_#7c5a16aa]" />)}
+          </div>
+          <div className="mt-1 text-sm font-semibold text-ink-2">{t({ en: `about ${Math.floor(f.holdingMg / 10_000)} coins of 10 grams`, hi: `लगभग ${Math.floor(f.holdingMg / 10_000)} सिक्के, हर एक 10 ग्राम का`, bn: `প্রায় ${Math.floor(f.holdingMg / 10_000)}টা মুদ্রা, প্রতিটা 10 গ্রামের` })}</div>
           <div className="text-sm text-ink-3">{t({ en: "pure gold, in open jobs", hi: "खरा सोना, चालू कामों में", bn: "খাঁটি সোনা, চালু কাজে" })}</div>
           <Balance3D tilt={given ? -Math.min(f.holdingMg / given, 1) * 0.8 : 0} leftBeads={Math.max(2, Math.min(11, Math.round(given / 30000)))} rightBeads={Math.max(1, Math.round((given - f.holdingMg) / 30000))} sparkles={false} className="-mt-3 h-[240px] w-full" />
           <div className="mt-2 grid grid-cols-2 gap-2 border-t border-line pt-3 text-center text-sm font-bold"><span>{t({ en: "Given to you", hi: "तुम्हें दिया", bn: "তোমাকে দেওয়া" })}<br /><Grams mg={given} /></span><span>{t({ en: "You gave back", hi: "तुमने लौटाया", bn: "তুমি ফেরত দিলে" })}<br /><Grams mg={given - f.holdingMg} /></span></div>

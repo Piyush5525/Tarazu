@@ -99,9 +99,12 @@ export function Ring({ bp, size = 132, label }: { bp: number; size?: number; lab
 export function Guide({ steps }: { steps: { en: string; hi: string; bn: string }[] }) {
   const t = useT();
   return (
-    <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-gold/40 bg-gold-2/15 p-3 sm:flex-row sm:items-center">
-      <div className="flex shrink-0 items-center gap-2 text-sm font-extrabold uppercase tracking-wide text-gold-deep">{t({ en: "What to do here", hi: "यहाँ क्या करना है", bn: "এখানে কী করতে হবে" })}</div>
-      <ol className="grid flex-1 gap-2 sm:grid-cols-3">
+    <div className="mb-5 rounded-2xl border border-gold/40 bg-gold-2/15 p-3 sm:p-4">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <div className="text-sm font-extrabold uppercase tracking-wide text-gold-deep">{t({ en: "What to do here", hi: "यहाँ क्या करना है", bn: "এখানে কী করতে হবে" })}</div>
+        <Speak text={steps.map((s, i) => `${i + 1}. ${t(s)}`).join(" ")} className="!min-h-10 shrink-0 !px-3" />
+      </div>
+      <ol className="grid gap-2 sm:grid-cols-3 sm:gap-4">
         {steps.map((s, i) => (
           <li key={i} className="flex items-start gap-2 text-[15px] leading-snug">
             <span className="num grid h-6 w-6 shrink-0 place-items-center rounded-full bg-ink text-xs font-bold text-ivory">{i + 1}</span>
@@ -109,7 +112,6 @@ export function Guide({ steps }: { steps: { en: string; hi: string; bn: string }
           </li>
         ))}
       </ol>
-      <Speak text={steps.map((s, i) => `${i + 1}. ${t(s)}`).join(" ")} label={false} className="shrink-0 self-start !px-3 sm:self-center" />
     </div>
   );
 }

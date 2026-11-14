@@ -21,6 +21,15 @@
 
 Limits to know: speech recognition must be told a language before it listens, so Tara listens in the language last used (Hindi mode also picks up English). To move to Bengali by voice, say "Bangla" once or type a Bengali message. Wake-word listening needs Chrome/Edge, an open tab, and uses the browser's online speech service.
 
+## Third pass: phone audit and voice (2026-11-14)
+
+- Audited all 8 screens at 360 px (Hindi) and 390 px (Bengali) with a script that looks for off-screen elements, clipped text, overlapping text and small tap targets. Fixed: Tara's panel/button covering content (now a full-screen chat on phones; button is smaller, tucks to the edge while scrolling, introduces herself once per visit), demo scene overflowing its stage, colliding fair-band labels, cramped persona row, guide strip layout, small links, desktop nav wrapping.
+- Demo: pausing the film now stops the narration as well.
+- Ledger: signature verification runs just after the screen draws instead of blocking it.
+- New: say yes / no aloud after a read-back (buttons still work); "say it again" and "speak slowly" to Tara; "Read every screen to me" mode (header on desktop, More menu on phones); gold shown as a row of 10-gram coins; Tara waves when she introduces herself; phone vibrates on signing.
+- Hero: floating signature cards around the scale (wide screens), live figures strip.
+- Re-ran the scripted demo path: 14/14, no page errors.
+
 ## Not verified
 
 - Real microphone input and spoken output (headless browser has neither). The code paths are the standard Web Speech API; test on the demo phone in Chrome. Bengali voice availability depends on the device.

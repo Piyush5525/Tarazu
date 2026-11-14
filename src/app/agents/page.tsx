@@ -81,20 +81,20 @@ export default function AgentRoom() {
       <div className="grid gap-5 lg:grid-cols-[1fr_1.15fr]">
         <div className="space-y-5">
           <section className="card overflow-hidden p-5">
-            <div className="flex items-center justify-between"><h2 className="text-xl font-semibold">{t({ en: "The balance", hi: "तराज़ू", bn: "দাঁড়িপাল্লা" })}</h2><span className={`chip ${settled ? "chip-ok" : "chip-warn"}`}>{settled ? <><Check size={14} />Settled · both signed</> : <>Disputed</>}</span></div>
+            <div className="flex items-center justify-between"><h2 className="text-xl font-semibold">{t({ en: "The balance", hi: "तराज़ू", bn: "দাঁড়িপাল্লা" })}</h2><span className={`chip ${settled ? "chip-ok" : "chip-warn"}`}>{settled ? <><Check size={14} />{t({ en: "Settled · both signed", hi: "निपट गया · दोनों के दस्तख़त", bn: "মিটে গেছে · দুজনের সই" })}</> : <>{t({ en: "In dispute", hi: "झगड़ा चल रहा है", bn: "বিবাদ চলছে" })}</>}</span></div>
             <Balance3D tilt={settled ? 0 : -0.7} leftBeads={9} rightBeads={settled ? 9 : 7} alert={!settled} sparkles={settled} className="-my-2 h-[270px] w-full" />
             <div className="grid grid-cols-2 gap-3 text-center text-sm">
-              <div><div className="text-xs font-bold text-ink-3">Issued (fine)</div><Grams mg={r.issuedFine} className="text-xl font-bold" /></div>
-              <div><div className="text-xs font-bold text-ink-3">Finished + scrap + allowed loss</div><Grams mg={r.finishedFine + r.scrapFine + (settled ? offer.capFine : r.capFine)} className="text-xl font-bold" /></div>
+              <div><div className="text-xs font-bold text-ink-3">{t({ en: "Gold given (pure)", hi: "दिया गया सोना (खरा)", bn: "দেওয়া সোনা (খাঁটি)" })}</div><Grams mg={r.issuedFine} className="text-xl font-bold" /></div>
+              <div><div className="text-xs font-bold text-ink-3">{t({ en: "Came back + scrap + allowed loss", hi: "वापस + चूरा + मंज़ूर छीजत", bn: "ফেরত + গুঁড়ো + অনুমোদিত ক্ষয়" })}</div><Grams mg={r.finishedFine + r.scrapFine + (settled ? offer.capFine : r.capFine)} className="text-xl font-bold" /></div>
             </div>
-            <div className="mt-3 rounded-2xl bg-ivory-2/80 p-3 text-center"><div className="text-xs font-bold text-ink-3">Rafiq owes</div>
+            <div className="mt-3 rounded-2xl bg-ivory-2/80 p-3 text-center"><div className="text-xs font-bold text-ink-3">{t({ en: "Rafiq has to give", hi: "रफ़ीक़ को देना है", bn: "রফিককে দিতে হবে" })}</div>
               <AnimatePresence mode="wait"><motion.div key={owes} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}><Grams mg={owes} className={`text-4xl font-bold ${settled ? "text-verdigris" : "text-terracotta"}`} /></motion.div></AnimatePresence>
             </div>
           </section>
 
           <section data-tara="band" className="card p-5">
-            <h2 className="text-xl font-semibold">Wastage fair band</h2>
-            <p className="text-sm text-ink-3">{DESIGN_CLASSES[job.designClass]} · learned from {band.n} closed jobs (seeded demo history)</p>
+            <h2 className="text-xl font-semibold">{t({ en: "How much loss is normal?", hi: "कितनी छीजत आम है?", bn: "কতটা ক্ষয় স্বাভাবিক?" })}</h2>
+            <p className="text-sm text-ink-3">{DESIGN_CLASSES[job.designClass]} · {t({ en: `learned from ${band.n} finished jobs (demo history)`, hi: `${band.n} पूरे हुए कामों से सीखा (डेमो आँकड़े)`, bn: `${band.n}টা শেষ হওয়া কাজ থেকে শেখা (ডেমো তথ্য)` })}</p>
             <div className="relative mt-12 h-5 rounded-full bg-line">
               <div className="absolute inset-y-0 rounded-full bg-verdigris/70" style={{ left: x(band.p10), width: `calc(${x(band.p90)} - ${x(band.p10)})` }} />
               <div className="absolute -top-1 h-7 w-1 rounded bg-ink" style={{ left: x(band.p50) }} />
@@ -105,20 +105,23 @@ export default function AgentRoom() {
                 </motion.div>
               ))}
             </div>
-            <div className="relative mt-1 h-5 text-xs font-bold text-ink-3">
-              <span className="num absolute -translate-x-1/2" style={{ left: x(band.p10) }}>P10 {pct(band.p10)}</span>
-              <span className="num absolute -translate-x-1/2 text-ink" style={{ left: x(band.p50) }}>P50 {pct(band.p50)}</span>
-              <span className="num absolute -translate-x-1/2" style={{ left: x(band.p90) }}>P90 {pct(band.p90)}</span>
+            <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+              {[{ k: "P10", v: band.p10, n: t({ en: "low", hi: "कम से कम", bn: "কম" }) }, { k: "P50", v: band.p50, n: t({ en: "usual", hi: "आम तौर पर", bn: "সাধারণত" }) }, { k: "P90", v: band.p90, n: t({ en: "high", hi: "ज़्यादा से ज़्यादा", bn: "বেশি" }) }].map((b) => (
+                <div key={b.k} className={`rounded-xl px-2 py-1.5 ${b.k === "P50" ? "bg-ink text-ivory" : "bg-verdigris/12 text-ink"}`}>
+                  <div className="num text-base font-bold">{pct(b.v)}%</div>
+                  <div className="text-[11px] font-semibold opacity-75">{b.k} · {b.n}</div>
+                </div>
+              ))}
             </div>
-            <div className="mt-4 flex flex-wrap items-center gap-2"><span className="chip chip-warn">{cls}</span><span className="text-sm text-ink-2">The loss is normal. The cap was not. The engine flags limits that hurt the karigar as well as losses that hurt the jeweller.</span></div>
+            <div className="mt-4 flex flex-wrap items-center gap-2"><span className="chip chip-warn">{cls}</span><span className="text-sm text-ink-2">{t({ en: "The loss is normal. The limit was not. Tarazu flags limits that hurt the karigar as well as losses that hurt the jeweller.", hi: "छीजत आम है। सीमा ही ग़लत थी। तराज़ू वह सीमा भी पकड़ता है जो कारीगर को नुक़सान दे, और वह छीजत भी जो सेठ को।", bn: "ক্ষয় স্বাভাবিক। সীমাটাই ভুল ছিল। তরাজু সেই সীমাও ধরে যা কারিগরের ক্ষতি করে, আর সেই ক্ষয়ও যা মালিকের।" })}</span></div>
           </section>
         </div>
 
         <section className="card-ink flex flex-col p-4 sm:p-5">
           <div className="flex flex-wrap items-center gap-3">
-            <h2 className="font-display text-xl font-semibold">Live transcript</h2>
+            <h2 className="font-display text-xl font-semibold">{t({ en: "The meeting, word for word", hi: "बैठक, शब्द-ब-शब्द", bn: "বৈঠক, কথায় কথায়" })}</h2>
             <span className="chip !border-white/20 !bg-white/10 !text-ivory"><ShieldCheck size={13} />Numeric Grounding Guard on</span>
-            <button onClick={() => { setShown(0); setPlaying(true); }} className="btn btn-gold ml-auto !min-h-12"><Play size={18} />{shown ? "Replay" : "Start the session"}</button>
+            <button onClick={() => { setShown(0); setPlaying(true); }} className="btn btn-gold ml-auto !min-h-12"><Play size={18} />{shown ? t({ en: "Replay", hi: "फिर चलाओ", bn: "আবার চালাও" }) : t({ en: "Start the session", hi: "बैठक शुरू करो", bn: "বৈঠক শুরু করো" })}</button>
           </div>
           <div className="mt-4 flex-1 space-y-4">
             {shown === 0 && !playing && <p className="py-10 text-center text-ivory/60">Press Start. Each agent may only call its own allow-listed tools, and may only quote numbers those tools returned.</p>}

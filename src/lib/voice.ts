@@ -26,6 +26,16 @@ function pickVoice(lang: Lang) {
   return null;
 }
 
+// A little slower than normal is easier to follow; "speak slowly" drops it further.
+let speechRate = 0.92;
+export const setSpeechRate = (r: number) => { speechRate = Math.max(0.6, Math.min(1.1, r)); };
+
+// The hands-free ear registers here so any one-shot listen() can borrow the microphone and give it back.
+export const earHooks = { pause: () => {}, resume: () => {} };
+
+export const YES_WORDS = /\b(yes|yeah|haan|han|ha|ji|sahi|theek|thik|correct|ok|okay)\b|हाँ|हां|जी|सही|ठीक|হ্যাঁ|হা|ঠিক|সঠিক/i;
+export const NO_WORDS = /\b(no|nahi|nahin|nai|na|galat|wrong|cancel)\b|नहीं|नही|ग़लत|गलत|না|ভুল/i;
+
 export const canSpeak = () => typeof window !== "undefined" && "speechSynthesis" in window;
 
 export function stopSpeaking() {
@@ -40,7 +50,7 @@ export function speak(text: string, lang: Lang, onEnd?: () => void) {
   const v = pickVoice(lang);
   if (v) u.voice = v;
   u.lang = v?.lang ?? BCP47[lang];
-  u.rate = 0.92; // a little slower: easier to follow
+  u.rate = speechRate;
   u.onend = () => onEnd?.();
   u.onerror = () => onEnd?.();
   synth.speak(u);
@@ -63,6 +73,9 @@ export function listen(lang: Lang, onText: (text: string, final: boolean) => voi
   const C = recCtor();
   if (!C) { onEnd("unsupported"); return () => {}; }
   stopSpeaking();
+  earHooks.pause();
+  const done = onEnd;
+  onEnd = (e) => { earHooks.resume(); done(e); };
   const rec = new C();
   rec.lang = BCP47[lang];
   rec.interimResults = true;

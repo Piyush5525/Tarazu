@@ -16,7 +16,16 @@ const WINDOW = 9;
 export default function LedgerPage() {
   const t = useT();
   const { chain, pending, tamper, tamperWith, repair, lastFinal } = useStore();
-  const check = useMemo(() => verifyChain(chain), [chain]);
+  // Hash links are checked at once (fast). Signatures are slower, so they are verified just after the screen
+  // has drawn, to keep a low-end phone responsive.
+  const quick = useMemo(() => verifyChain(chain, false), [chain]);
+  const [full, setFull] = useState<{ of: unknown; res: ReturnType<typeof verifyChain> } | null>(null);
+  useEffect(() => {
+    const id = setTimeout(() => setFull({ of: chain, res: verifyChain(chain) }), 60);
+    return () => clearTimeout(id);
+  }, [chain]);
+  const sigsChecked = full?.of === chain;
+  const check = !quick.ok ? quick : sigsChecked ? full!.res : quick;
   const seal = useMemo(() => (chain.length ? daySeal(chain, chain[chain.length - 1].ts) : null), [chain]);
   const [qr, setQr] = useState("");
   useEffect(() => { if (seal) QRCode.toDataURL(`tarazu-day-seal:${seal.day}:${seal.root}`, { margin: 1, width: 220, color: { dark: "#15130F", light: "#FBF8F1" } }).then(setQr).catch(() => {}); }, [seal]);
@@ -43,7 +52,7 @@ export default function LedgerPage() {
       <section data-tara="chain" className={`card overflow-hidden p-4 ${check.ok ? "" : "!border-terracotta border-2"}`}>
         <div className="flex flex-wrap items-center gap-3">
           {check.ok
-            ? <span className="chip chip-ok px-4 py-2 text-sm"><CheckCircle2 size={16} />{t({ en: "Chain intact", hi: "ज़ंजीर सही-सलामत", bn: "শিকল অটুট" })} · {chain.length} · SHA-256 + Ed25519</span>
+            ? <span className="chip chip-ok px-4 py-2 text-sm"><CheckCircle2 size={16} />{t({ en: "Chain intact", hi: "ज़ंजीर सही-सलामत", bn: "শিকল অটুট" })} · {chain.length} · {sigsChecked ? "SHA-256 + Ed25519 ✓" : "SHA-256 ✓ · checking signatures…"}</span>
             : <motion.span initial={{ scale: 0.8 }} animate={{ scale: [1, 1.06, 1] }} transition={{ repeat: Infinity, duration: 1.2 }} className="chip chip-warn px-4 py-2 text-sm"><AlertOctagon size={16} />{t({ en: "Tampering detected at entry", hi: "छेड़छाड़ पकड़ी गई, एंट्री", bn: "কারচুপি ধরা পড়েছে, এন্ট্রি" })} #{(check.brokenAt ?? 0) + 1} ({chain[check.brokenAt ?? 0]?.id}) · {check.reason}</motion.span>}
           <div className="ml-auto">
             {tamper

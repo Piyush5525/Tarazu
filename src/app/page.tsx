@@ -5,6 +5,8 @@ import { ArrowRight, BadgeCheck, CalendarHeart, Check, GitCompareArrows, Hammer,
 import { useMemo, useState } from "react";
 import { HandCoins, PackageCheck } from "lucide-react";
 import { fineMg, grams, pct, ratioBp } from "@/lib/ledger/units";
+import { verifyChain } from "@/lib/ledger/engine";
+import { useStore } from "@/lib/store";
 import { Balance3D, GoldField } from "@/components/three/lazy";
 import { GoldJourney, Reveal, Speak, Tilt } from "@/components/ui";
 import { useT, type L } from "@/lib/i18n";
@@ -29,6 +31,8 @@ export default function HomePage() {
   const [pans, setPans] = useState({ left: 6, right: 4 });
   const diff = pans.right - pans.left;
   const level = diff === 0;
+  const chain = useStore((s) => s.chain);
+  const intact = useMemo(() => verifyChain(chain, false).ok, [chain]);
   // Scenario A, computed by the ledger engine (not typed in)
   const journey = useMemo(() => {
     const issued = fineMg(250_000, 9160), loss = issued - fineMg(238_400, 9160) - fineMg(7_100, 8500);
@@ -59,10 +63,35 @@ export default function HomePage() {
             <span className="chip"><ShieldCheck size={14} />{t({ en: "Tamper-evident", hi: "छेड़छाड़ पकड़ में", bn: "কারচুপি ধরা পড়ে" })}</span>
             <span className="chip">हिंदी · বাংলা · English</span>
           </div>
+          {/* live figures from the ledger behind this page */}
+          <dl className="mt-7 grid max-w-xl grid-cols-3 divide-x divide-line rounded-2xl border border-line bg-paper/70 text-center backdrop-blur">
+            {[
+              { v: String(chain.length), l: t({ en: "entries, each signed", hi: "एंट्री, हर एक पर दस्तख़त", bn: "এন্ট্রি, প্রতিটায় সই" }) },
+              { v: intact ? "100%" : "!", l: t({ en: "of the chain verified", hi: "ज़ंजीर जाँची हुई", bn: "শিকল যাচাই করা" }) },
+              { v: "3", l: t({ en: "languages, spoken aloud", hi: "भाषाएँ, बोलकर", bn: "ভাষা, মুখে বলে" }) },
+            ].map((s) => (
+              <div key={s.l} className="px-2 py-3"><dt className="num gold-text text-2xl font-bold sm:text-3xl">{s.v}</dt><dd className="text-[12px] font-semibold leading-tight text-ink-2 sm:text-sm">{s.l}</dd></div>
+            ))}
+          </dl>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.9, delay: 0.15 }} className="relative order-first lg:order-none">
           <Balance3D tilt={diff / 4} leftBeads={pans.left} rightBeads={pans.right} onPan={(side) => setPans((p) => ({ ...p, [side]: Math.min(p[side] + 1, 12) }))} className="h-[300px] w-full sm:h-[520px]" />
+          {/* what the scale stands for, floating around it (wide screens only: no room on a phone) */}
+          <div className="pointer-events-none absolute inset-0 hidden xl:block" aria-hidden>
+            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.1 }} className="floaty absolute left-0 top-[26%] flex items-center gap-2 rounded-2xl border border-line bg-paper/90 px-3 py-2 text-sm font-bold shadow-lg backdrop-blur">
+              <span className="grid h-8 w-8 place-items-center rounded-full bg-verdigris text-white"><Check size={16} /></span>
+              <span>{t({ en: "Karigar signed", hi: "कारीगर के दस्तख़त", bn: "কারিগরের সই" })}<span className="block text-[11px] font-semibold text-ink-3">Bablu Maity</span></span>
+            </motion.div>
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.5 }} className="floaty absolute right-0 top-[14%] flex items-center gap-2 rounded-2xl border border-line bg-paper/90 px-3 py-2 text-sm font-bold shadow-lg backdrop-blur" style={{ animationDelay: "1.2s" }}>
+              <span className="grid h-8 w-8 place-items-center rounded-full bg-bahi text-white"><Check size={16} /></span>
+              <span>{t({ en: "Jeweller signed", hi: "सेठ के दस्तख़त", bn: "মালিকের সই" })}<span className="block text-[11px] font-semibold text-ink-3">Mehta Jewellers</span></span>
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.9 }} className="floaty absolute bottom-[30%] right-[2%] flex items-center gap-2 rounded-2xl border border-gold/50 bg-ink px-3 py-2 text-sm font-bold text-ivory shadow-lg" style={{ animationDelay: "2.1s" }}>
+              <ShieldCheck size={18} className="text-gold-2" />
+              <span>{t({ en: "Locked in the chain", hi: "ज़ंजीर में बंद", bn: "শিকলে আটকানো" })}<span className="num block text-[11px] font-semibold text-ivory/60">{chain.length ? chain[chain.length - 1].hash.slice(0, 14) : ""}…</span></span>
+            </motion.div>
+          </div>
           <div className="pointer-events-none absolute inset-x-0 top-2 flex justify-center">
             <AnimatePresence mode="wait">
               <motion.div key={level ? "ok" : "no"} initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className={`chip ${level ? "chip-ok" : "chip-warn"} px-4 py-2 text-sm shadow-md`}>

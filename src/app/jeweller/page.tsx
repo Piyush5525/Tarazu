@@ -68,7 +68,7 @@ export default function JewellerPage() {
         <section className="card p-5">
           <h2 className="flex items-center gap-2 text-2xl font-semibold"><Stamp className="text-bahi" />Countersign queue</h2>
           <p className="text-sm text-ink-3">Pending entries are visible to both sides and excluded from every balance. They expire in 24h.</p>
-          {forMe.length + forKarigar.length === 0 && <div className="mt-4 rounded-2xl bg-ivory-2/70 p-6 text-center text-ink-3"><Check className="mx-auto mb-1" />Nothing waiting. Record gold from <Link className="font-bold text-bahi underline" href="/karigar">the karigar&apos;s book</Link> to see an entry arrive.</div>}
+          {forMe.length + forKarigar.length === 0 && <div className="mt-4 rounded-2xl bg-ivory-2/70 p-6 text-center text-ink-3"><Check className="mx-auto mb-1" />Nothing waiting. Record gold from <Link className="inline-flex min-h-11 items-center font-bold text-bahi underline" href="/karigar">the karigar&apos;s book</Link> to see an entry arrive.</div>}
           <AnimatePresence>
             {forMe.map((e) => (
               <motion.div key={e.id} layout initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, scale: 0.9 }} className="mt-3 flex flex-wrap items-center gap-3 rounded-2xl border-2 border-gold bg-gold-2/15 p-4">
@@ -115,7 +115,7 @@ export default function JewellerPage() {
             <div className="rounded-2xl border border-line bg-white/70 p-4">
               <div className="font-bold">2. Tell the customer early, with date options</div>
               <div className="mt-1 text-sm text-ink-2">Delivery one day later: <b className="num">{Math.round(plus[0] / 100)}%</b> · two days later: <b className="num">{Math.round(plus[1] / 100)}%</b></div>
-              <Link href="/track" className="mt-2 inline-block text-sm font-bold text-bahi underline">See what Aarti sees</Link>
+              <Link href="/track" className="mt-1 inline-flex min-h-11 items-center text-sm font-bold text-bahi underline">See what Aarti sees</Link>
             </div>
           </div>
           <DemoNote>Stage durations are demo configuration values, not field measurements.</DemoNote>

@@ -17,7 +17,8 @@ function Gold({ rough = 0.22 }: { rough?: number }) {
   return <meshStandardMaterial color={GOLD} metalness={1} roughness={rough} envMapIntensity={1.4} />;
 }
 
-function Face({ mood }: { mood: TaraMood }) {
+function Face({ mood, wave }: { mood: TaraMood; wave?: boolean }) {
+  const hand = useRef<THREE.Group>(null!);
   const root = useRef<THREE.Group>(null!);
   const head = useRef<THREE.Group>(null!);
   const lidL = useRef<THREE.Group>(null!);
@@ -67,6 +68,10 @@ function Face({ mood }: { mood: TaraMood }) {
     mouth.current.scale.set(1 - open * 0.25, THREE.MathUtils.lerp(mouth.current.scale.y, open, 0.35), 1);
     mouth.current.visible = open > 0.04;
     smile.current.visible = !mouth.current.visible;
+    // a little hand pops up and waves when she wants attention
+    const hs = THREE.MathUtils.lerp(hand.current.scale.x, wave ? 1 : 0, 0.14);
+    hand.current.scale.setScalar(hs);
+    hand.current.rotation.z = -0.25 + Math.sin(t * 9) * 0.38 * hs;
     // jhumkas swing with the head
     const swing = Math.sin(t * 2.4) * 0.12 + head.current.rotation.z * 0.8;
     earL.current.rotation.z = swing; earR.current.rotation.z = swing;
@@ -97,6 +102,15 @@ function Face({ mood }: { mood: TaraMood }) {
       <mesh position={[0, -1.3, 0.72]}><sphereGeometry args={[0.11, 14, 14]} /><Gold /></mesh>
       <mesh position={[0, -0.95, 0]}><cylinderGeometry args={[0.3, 0.36, 0.5, 20]} /><meshStandardMaterial color="#dca97c" roughness={0.6} /></mesh>
 
+      {/* waving hand: palm, four fingers, thumb, two gold bangles */}
+      <group ref={hand} position={[1.02, -1.3, 0.72]} scale={0}>
+        <mesh position={[0, 0.34, 0]} scale={[1, 1.15, 0.5]}><sphereGeometry args={[0.22, 20, 20]} /><meshStandardMaterial color={SKIN} roughness={0.55} /></mesh>
+        {[-0.14, -0.05, 0.05, 0.14].map((x, i) => <mesh key={i} position={[x, 0.62 + (i === 1 || i === 2 ? 0.04 : 0), 0]}><capsuleGeometry args={[0.042, 0.16, 4, 8]} /><meshStandardMaterial color={SKIN} roughness={0.55} /></mesh>)}
+        <mesh position={[-0.24, 0.38, 0.02]} rotation={[0, 0, 0.9]}><capsuleGeometry args={[0.045, 0.12, 4, 8]} /><meshStandardMaterial color={SKIN} roughness={0.55} /></mesh>
+        <mesh position={[0, 0.02, 0]}><cylinderGeometry args={[0.12, 0.14, 0.3, 12]} /><meshStandardMaterial color={SKIN} roughness={0.55} /></mesh>
+        {[0.06, -0.03].map((y) => <mesh key={y} position={[0, y, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.15, 0.03, 8, 24]} /><Gold /></mesh>)}
+      </group>
+
       <group ref={head}>
         <mesh scale={[1, 1.04, 0.98]}><sphereGeometry args={[1, 48, 48]} /><meshStandardMaterial color={SKIN} roughness={0.55} /></mesh>
         {/* hair: cap, side locks, bun */}
@@ -125,7 +139,7 @@ function Face({ mood }: { mood: TaraMood }) {
   );
 }
 
-export default function TaraAvatar({ mood = "idle", className = "" }: { mood?: TaraMood; className?: string }) {
+export default function TaraAvatar({ mood = "idle", wave = false, className = "" }: { mood?: TaraMood; wave?: boolean; className?: string }) {
   return (
     <div className={className} aria-hidden>
       <Canvas dpr={[1, 2]} camera={{ position: [0, -0.3, 7.6], fov: 30 }} gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}>
@@ -138,7 +152,7 @@ export default function TaraAvatar({ mood = "idle", className = "" }: { mood?: T
           <Lightformer intensity={2.5} position={[-4, 0, 3]} rotation-y={Math.PI / 2} scale={[6, 3, 1]} color="#ffe2a0" />
           <Lightformer intensity={1} position={[0, -3, 0]} rotation-x={Math.PI / 2} scale={[8, 8, 1]} color="#7a5a1c" />
         </Environment>
-        <Face mood={mood} />
+        <Face mood={mood} wave={wave} />
       </Canvas>
     </div>
   );

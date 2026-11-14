@@ -43,10 +43,10 @@ function SBalance({ playing }: { playing: boolean }) {
 function SVoice({ playing, links }: { playing: boolean; links: { id: string }[] }) {
   const s = useSteps(5, 1350, playing);
   return (
-    <div className="grid h-full items-center gap-4 p-4 sm:grid-cols-2 sm:p-8">
-      <div className="mx-auto w-full max-w-[250px] rounded-[30px] border-4 border-white/15 bg-[#efe6d2] p-3 text-ink shadow-2xl">
+    <div className="grid h-full content-center items-center gap-3 p-4 sm:grid-cols-2 sm:gap-4 sm:p-8">
+      <div className="mx-auto w-full max-w-[230px] rounded-[28px] border-4 border-white/15 bg-[#efe6d2] p-3 text-ink shadow-2xl sm:max-w-[250px]">
         <div className="mb-2 flex items-center gap-2 rounded-xl bg-verdigris px-3 py-2 text-xs font-bold text-white"><Mic size={14} />Mehta Jewellers</div>
-        <div className="min-h-[190px] space-y-2">
+        <div className="min-h-[168px] space-y-2 sm:min-h-[190px]">
           <motion.div {...pop} className="ml-auto flex w-fit items-center gap-2 rounded-2xl rounded-br-sm bg-[#d9f2c7] px-3 py-2 text-verdigris"><span className="wave"><i /><i /><i /><i /><i /></span></motion.div>
           {s >= 1 && <motion.div {...pop} className="w-fit max-w-[92%] rounded-2xl rounded-bl-sm bg-white px-3 py-2 text-[13px]">আজ সোনা পেলে?<div className="num mt-1 rounded-lg bg-gold-2/30 px-2 py-1 text-center text-xl font-bold">250.000 g<span className="ml-1 text-xs">22K</span></div></motion.div>}
           {s >= 2 && <motion.div {...pop} className="grid grid-cols-2 gap-2"><span className="grid h-10 place-items-center rounded-xl bg-verdigris text-white ring-4 ring-verdigris/30"><Check size={20} /></span><span className="grid h-10 place-items-center rounded-xl bg-terracotta/30 text-terracotta"><X size={20} /></span></motion.div>}
@@ -55,12 +55,12 @@ function SVoice({ playing, links }: { playing: boolean; links: { id: string }[] 
       <div className="text-center">
         <div className="flex justify-center gap-3">
           {[{ n: "Bablu", at: 2, c: "#1f6f5c", i: Hammer }, { n: "Mehta", at: 3, c: "#8e1b1b", i: Store }].map((p) => (
-            <motion.div key={p.n} animate={s >= p.at ? { scale: [1.5, 1], rotate: [-18, -6], opacity: 1 } : { opacity: 0.25 }} className="grid h-20 w-24 place-items-center rounded-xl border-2 border-dashed text-xs font-extrabold uppercase" style={{ borderColor: p.c, color: s >= p.at ? "#fff" : "#fff8", background: s >= p.at ? p.c : "transparent" }}>
+            <motion.div key={p.n} animate={s >= p.at ? { scale: [1.5, 1], rotate: [-18, -6], opacity: 1 } : { opacity: 0.25 }} className="grid h-16 w-24 place-items-center rounded-xl border-2 border-dashed text-[11px] font-extrabold uppercase sm:h-20 sm:text-xs" style={{ borderColor: p.c, color: s >= p.at ? "#fff" : "#fff8", background: s >= p.at ? p.c : "transparent" }}>
               <span><p.i className="mx-auto mb-0.5" size={18} />{p.n}<br />{s >= p.at ? "signed ✓" : "…"}</span>
             </motion.div>
           ))}
         </div>
-        <div className="mt-2 h-[120px]">{s >= 3 && <Chain3D links={s >= 4 ? [...links, { id: "new" }] : links} brokenAt={null} newest="new" className="h-[120px] w-full" />}</div>
+        <div className="mt-1 h-[84px] sm:mt-2 sm:h-[120px]">{s >= 3 && <Chain3D links={s >= 4 ? [...links, { id: "new" }] : links} brokenAt={null} newest="new" className="h-[84px] w-full sm:h-[120px]" />}</div>
         {s >= 4 && <motion.div {...pop} className="mx-auto inline-flex items-center gap-2 rounded-full bg-gold-2/20 px-4 py-1.5 text-sm font-bold text-gold-2"><Stamp size={15} />Day Seal sent to both</motion.div>}
       </div>
     </div>
@@ -236,13 +236,13 @@ export default function DemoPage() {
 
   // Auto-advance. With narration on, wait for her to finish the line as well as the scene's own length.
   useEffect(() => {
-    if (!playing) return;
+    if (!playing) { stopSpeaking(); return; } // pausing the film silences the narrator too
     started.current = Date.now();
     let spoken = !sound, timeUp = false, dead = false;
     const next = () => { if (dead || !spoken || !timeUp) return; if (i < SCENES.length - 1) { setI(i + 1); setRun((x) => x + 1); } else setPlaying(false); };
     if (sound) speak(SCENES[i].line[lang], lang, () => { spoken = true; next(); });
     const id = setTimeout(() => { timeUp = true; next(); }, SCENES[i].ms);
-    return () => { dead = true; clearTimeout(id); };
+    return () => { dead = true; clearTimeout(id); if (sound) stopSpeaking(); };
   }, [i, playing, sound, lang, run]);
 
   useEffect(() => {
@@ -267,10 +267,12 @@ export default function DemoPage() {
       </div>
 
       <section className="overflow-hidden rounded-[28px] border border-[#332d22] text-ivory shadow-2xl" style={{ background: "radial-gradient(120% 90% at 50% 0%, #3a2d18 0%, #1b1813 55%, #100e0b 100%)" }}>
-        <div className="flex gap-1.5 px-4 pt-4">
+        <div className="flex gap-1.5 px-4 pt-1">
           {SCENES.map((s, k) => (
-            <button key={s.id} onClick={() => go(k)} aria-label={`Scene ${k + 1}`} className="h-2 flex-1 overflow-hidden rounded-full bg-white/15">
-              {k < i ? <span className="block h-full w-full gold-fill" /> : k === i ? <motion.span key={key + String(playing)} className="block h-full gold-fill" initial={{ width: "0%" }} animate={{ width: playing ? "100%" : "35%" }} transition={{ duration: playing ? sc.ms / 1000 : 0, ease: "linear" }} /> : null}
+            <button key={s.id} onClick={() => go(k)} aria-label={`Scene ${k + 1}`} className="flex h-11 flex-1 items-center">
+              <span className="block h-2 w-full overflow-hidden rounded-full bg-white/15">
+                {k < i ? <span className="block h-full w-full gold-fill" /> : k === i ? <motion.span key={key + String(playing)} className="block h-full gold-fill" initial={{ width: "0%" }} animate={{ width: playing ? "100%" : "35%" }} transition={{ duration: playing ? sc.ms / 1000 : 0, ease: "linear" }} /> : null}
+              </span>
             </button>
           ))}
         </div>
@@ -279,7 +281,7 @@ export default function DemoPage() {
           <AnimatePresence mode="wait"><motion.h2 key={sc.id} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="text-xl font-semibold sm:text-2xl">{t(sc.title)}</motion.h2></AnimatePresence>
         </div>
 
-        <div className="relative h-[430px] sm:h-[400px]">
+        <div className="relative h-[520px] sm:h-[400px]">
           <AnimatePresence mode="wait">
             <motion.div key={key} className="absolute inset-0" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.02 }} transition={{ duration: 0.35 }}>
               {sc.id === "balance" && <SBalance playing={playing} />}

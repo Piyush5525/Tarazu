@@ -88,10 +88,10 @@ export default function PassportPage() {
                   <div className="relative text-sm font-semibold opacity-80">{f.who.tier} karigar · since {f.who.since} · {f.who.city}</div>
                   <div className="num relative mt-6 flex items-end justify-between text-xs font-bold"><span>ID {cred.id}</span><span className="inline-flex items-center gap-1"><RotateCw size={13} />{t({ en: "tap to flip", hi: "पलटने के लिए छुओ", bn: "উল্টাতে ছোঁও" })}</span></div>
                 </div>
-                <div className="flip-face flip-back absolute inset-0 grid place-items-center rounded-[24px] border border-line bg-paper p-4 shadow-2xl">
+                <div className="flip-face flip-back absolute inset-0 flex flex-col items-center justify-center gap-1.5 overflow-hidden rounded-[24px] border border-line bg-paper p-3 text-center shadow-2xl">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  {qr && <img src={qr} alt="Passport QR code" className="h-[78%] w-auto rounded-lg" />}
-                  <span className="text-xs font-bold text-ink-3">{t({ en: "Scan works only while you allow it", hi: "स्कैन तभी चलेगा जब तक तुम इजाज़त दो", bn: "যতক্ষণ তুমি অনুমতি দাও, ততক্ষণই স্ক্যান চলবে" })}</span>
+                  {qr && <img src={qr} alt="Passport QR code" className="h-[70%] w-auto rounded-lg" />}
+                  <span className="px-2 text-[11px] font-bold leading-tight text-ink-3">{t({ en: "Scan works only while you allow it", hi: "स्कैन तभी चलेगा जब तक तुम इजाज़त दो", bn: "যতক্ষণ তুমি অনুমতি দাও, ততক্ষণই স্ক্যান চলবে" })}</span>
                 </div>
               </button>
             </div>

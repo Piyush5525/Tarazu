@@ -31,6 +31,8 @@ type State = {
   tamperWith: (index: number) => void;
   repair: () => void;
   setRebalance: (r: State["rebalance"]) => void;
+  autoRead: boolean; // "read every screen to me": each page speaks its own summary when it opens
+  setAutoRead: (on: boolean) => void;
 };
 
 const savedLang = (): Lang => {
@@ -49,7 +51,15 @@ export const useStore = create<State>((set, get) => {
   return {
     ready: false, lang: "hi", me: "bablu", chain: [], pending: [], jobs: [], history: [], babluBook: [], weddingTs: 0, nextNo: 1,
     tamper: null, rebalance: "none", lastFinal: null,
-    init: () => { if (!get().ready) { set({ lang: savedLang() }); load(); } },
+    autoRead: false,
+    setAutoRead: (autoRead) => { try { localStorage.setItem("tarazu-autoread", autoRead ? "1" : ""); } catch {} set({ autoRead }); },
+    init: () => {
+      if (get().ready) return;
+      let autoRead = false;
+      try { autoRead = localStorage.getItem("tarazu-autoread") === "1"; } catch {}
+      set({ lang: savedLang(), autoRead });
+      load();
+    },
     reset: load,
     setLang: (lang) => { try { localStorage.setItem("tarazu-lang", lang); } catch {} set({ lang }); },
     setMe: (me) => set({ me }),

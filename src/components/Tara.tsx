@@ -7,7 +7,7 @@ import { useStore, type Lang } from "@/lib/store";
 import { useFacts } from "@/lib/facts";
 import { tr, useT, type L } from "@/lib/i18n";
 import { brain, CHIPS, PAGE_HELP, snapshot, TOUR, type Reply } from "@/lib/tara";
-import { canListen, listen, speak, stopSpeaking, toAsciiDigits } from "@/lib/voice";
+import { canListen, listen, setSpeechRate, speak, stopSpeaking, toAsciiDigits } from "@/lib/voice";
 import { detectLang, heardName, startEar, type Ear as EarCtl } from "@/lib/ear";
 import { groundingGuard } from "@/lib/ledger/analytics";
 import { TaraAvatar } from "./three/lazy";
@@ -22,7 +22,9 @@ const HELLO: L = {
   bn: "নমস্কার, আমি তারা। নিজের ভাষায় আমার সাথে কথা বলো, আমি সেই ভাষাতেই উত্তর দেব। দরকার হলে শুধু আমার নাম ধরে ডাকো: তারা।",
 };
 const YES: L = { en: "Yes, tell me.", hi: "हाँ, बोलो।", bn: "হ্যাঁ, বলো।" };
-const STOP_WORDS = /^(stop|quiet|bas|chup|ruko|ruk jao|band karo|thamo|बस|चुप|रुको|बंद करो|থামো|চুপ)\b|^(बस|चुप|रुको|থামো)/i;
+const SLOW_WORDS = /\b(slow|slowly|dheere|dhire|aaram se|aste)\b|धीरे|आराम से|আস্তে|ধীরে/i;
+const AGAIN_WORDS = /\b(again|repeat|once more|phir se|fir se|dobara|dubara|abar)\b|फिर से|दोबारा|दुबारा|আবার|আরেকবার/i;
+const STOP_WORDS =/^(stop|quiet|bas|chup|ruko|ruk jao|band karo|thamo|बस|चुप|रुको|बंद करो|থামো|চুপ)\b|^(बस|चुप|रुको|থামো)/i;
 
 /** Put a gold ring around the thing Tara is talking about, and scroll it into view. */
 export function spotlight(name?: string) {
@@ -68,7 +70,21 @@ export default function Tara() {
 
   useEffect(() => { hearLang.current = lang; }, [lang]);
   useEffect(() => { fetch("/api/tara").then((r) => r.json()).then((d) => setLive(!!d.live)).catch(() => {}); }, []);
-  useEffect(() => { const a = setTimeout(() => setNudge(true), 3000), b = setTimeout(() => setNudge(false), 12000); return () => { clearTimeout(a); clearTimeout(b); }; }, []);
+  // Introduce herself once per visit, not on every screen.
+  useEffect(() => {
+    try { if (sessionStorage.getItem("tarazu-met")) return; sessionStorage.setItem("tarazu-met", "1"); } catch {}
+    const a = setTimeout(() => setNudge(true), 2500), b = setTimeout(() => setNudge(false), 9000);
+    return () => { clearTimeout(a); clearTimeout(b); };
+  }, []);
+  // On a phone she slides to the edge while the page is moving, so she never sits on what you are reading.
+  const [tucked, setTucked] = useState(false);
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    const onScroll = () => { setTucked(true); clearTimeout(timer); timer = setTimeout(() => setTucked(false), 900); };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => { window.removeEventListener("scroll", onScroll); clearTimeout(timer); };
+  }, []);
+  const lastSaid = useRef<{ text: string; lang: Lang } | null>(null);
   useEffect(() => { scroller.current?.scrollTo({ top: 99999, behavior: "smooth" }); }, [msgs, heard]);
 
   /** After she finishes talking: open a short window where she keeps listening for the follow-up. */
@@ -85,6 +101,7 @@ export default function Tara() {
 
   const say = useCallback((text: string, l: Lang, after?: () => void, live?: boolean) => {
     setMsgs((m) => [...m, { from: "tara", text, lang: l, live }]);
+    lastSaid.current = { text, lang: l };
     ear.current?.pause(); // never let her hear herself
     if (ctx.current.muted) { afterSpeech(); after?.(); return; }
     setMood("speaking");
@@ -122,6 +139,9 @@ export default function Tara() {
     if (l !== ctx.current.lang) setLang(l);
     setMsgs((m) => [...m, { from: "me", text: q, lang: l }]);
     if (STOP_WORDS.test(q)) { setMood("idle"); ear.current?.resume(); return; }
+    // "say it again" and "speak slowly": the two things people ask a voice most
+    if (SLOW_WORDS.test(q)) { setSpeechRate(0.72); say(tr(l, { en: "Sure. I will speak slowly now.", hi: "ठीक है। अब मैं धीरे-धीरे बोलूँगी।", bn: "ঠিক আছে। এখন আমি আস্তে আস্তে বলব।" }) + (lastSaid.current ? " " + lastSaid.current.text : ""), l); return; }
+    if (AGAIN_WORDS.test(q) && lastSaid.current) { say(lastSaid.current.text, lastSaid.current.lang); return; }
 
     const c = { lang: l, path: ctx.current.path, facts: ctx.current.facts };
     const r = brain(q, c);
@@ -233,19 +253,19 @@ export default function Tara() {
   return (
     <>
       {/* launcher: a living portrait, bottom-right, above the phone tab bar */}
-      <div className="fixed bottom-[88px] right-3 z-50 flex items-end gap-2 md:bottom-6 md:right-6">
+      <div className={`fixed bottom-[84px] right-2 z-50 flex flex-col items-end gap-2 transition-transform duration-300 md:right-6 xl:bottom-6 ${open ? "max-md:hidden" : ""} ${tucked && !nudge ? "max-md:translate-x-[42%] max-md:opacity-80" : ""}`}>
         <AnimatePresence>
           {nudge && !open && (
             <motion.button initial={{ opacity: 0, x: 16, scale: 0.9 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: 16 }} onClick={toggle}
-              className="relative mb-6 max-w-[210px] rounded-2xl rounded-br-sm border border-line bg-paper px-4 py-3 text-left text-sm font-semibold shadow-xl">
+              className="relative mr-1 max-w-[220px] rounded-2xl rounded-br-sm border border-line bg-paper px-4 py-3 text-left text-sm font-semibold shadow-xl">
               {t({ en: "Hi, I am Tara. Tap me, or just say my name.", hi: "मैं तारा हूँ। मुझे छुओ, या बस मेरा नाम लो।", bn: "আমি তারা। আমাকে ছোঁও, বা শুধু নাম ধরে ডাকো।" })}
             </motion.button>
           )}
         </AnimatePresence>
         <motion.button onClick={toggle} whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.92 }} aria-label={t({ en: "Open Tara, the voice helper", hi: "तारा, बोलने वाली सहायक खोलो", bn: "তারা, কথা-বলা সহায়ক খোলো" })}
-          className="group relative h-[92px] w-[92px] shrink-0 md:h-[104px] md:w-[104px]">
+          className="group relative h-[78px] w-[78px] shrink-0 md:h-[104px] md:w-[104px]">
           <span className={`absolute inset-1 rounded-full ${open ? "" : "pulse-ring"}`} style={{ background: "radial-gradient(circle at 35% 25%, #fffaf0 0%, #f6e3b0 45%, #d9b45a 100%)", boxShadow: "0 0 0 3px #c9a24b, 0 0 0 6px #fbf8f1, 0 14px 30px -8px #6b4c10cc" }} />
-          <span className="absolute inset-1 overflow-hidden rounded-full"><TaraAvatar mood={mood} className="h-full w-full" /></span>
+          <span className="absolute inset-1 overflow-hidden rounded-full"><TaraAvatar mood={mood} wave={nudge} className="h-full w-full" /></span>
           <span className="absolute -bottom-2 left-1/2 flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full bg-ink px-2.5 py-1 text-[12px] font-bold text-ivory shadow-lg">
             <span className={`h-2 w-2 rounded-full ${earOn ? "bg-emerald-400" : "bg-gold-2"} ${mood === "listening" ? "animate-ping" : ""}`} />
             {t({ en: "Tara", hi: "तारा", bn: "তারা" })}
@@ -256,7 +276,7 @@ export default function Tara() {
       <AnimatePresence>
         {open && (
           <motion.div role="dialog" aria-label="Tara" initial={{ opacity: 0, y: 40, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 40, scale: 0.96 }} transition={{ type: "spring", stiffness: 260, damping: 26 }}
-            className="fixed inset-x-2 bottom-[190px] top-16 z-50 flex flex-col overflow-hidden rounded-[26px] border border-line bg-paper shadow-2xl md:inset-x-auto md:bottom-[140px] md:right-6 md:top-auto md:h-[620px] md:max-h-[calc(100vh-170px)] md:w-[400px]">
+            className="fixed inset-0 z-[60] flex h-dvh flex-col overflow-hidden bg-paper shadow-2xl md:inset-auto md:bottom-[200px] md:right-6 md:z-50 xl:bottom-[140px] md:h-[620px] md:max-h-[calc(100vh-230px)] xl:max-h-[calc(100vh-170px)] md:w-[400px] md:rounded-[26px] md:border md:border-line">
             <div className="relative flex items-center gap-3 px-4 py-3 text-ivory" style={{ background: "linear-gradient(135deg,#2a2018,#15130F 60%)" }}>
               <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full" style={{ background: "radial-gradient(circle at 35% 25%, #fffaf0, #e6c56e)", boxShadow: "0 0 0 2px #c9a24b" }}>
                 <TaraAvatar mood={mood} className="h-full w-full scale-[1.18] translate-y-[6%]" />
@@ -266,7 +286,7 @@ export default function Tara() {
                 <div className="flex items-center gap-1.5 text-[13px] text-ivory/75">
                   {live && <Sparkles size={12} className="shrink-0 text-gold-2" />}
                   {(mood === "listening" || mood === "speaking") && <span className="wave scale-50 text-gold-2"><i /><i /><i /></span>}
-                  <span className="truncate">{status}</span>
+                  <span className="line-clamp-2 leading-tight">{status}</span>
                 </div>
               </div>
               <button onClick={() => (earOn ? stopListeningForName() : startListeningForName())} className={`grid h-11 w-11 place-items-center rounded-full ${earOn ? "bg-emerald-500/25 text-emerald-300" : "bg-white/10"}`}

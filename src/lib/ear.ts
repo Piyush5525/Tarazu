@@ -1,6 +1,6 @@
 "use client";
 import type { Lang } from "./store";
-import { BCP47, recCtor, type Rec } from "./voice";
+import { BCP47, earHooks, recCtor, type Rec } from "./voice";
 
 /* ---------- Which language did they just use? ---------- */
 
@@ -55,12 +55,15 @@ export function startEar(getLang: () => Lang, onPhrase: (text: string) => void, 
     try { r.start(); } catch { rec = null; setTimeout(boot, 900); }
   };
   boot();
-  return {
+  const ctl = {
     supported: !!C,
     pause: () => { paused = true; try { rec?.abort(); } catch {} },
     resume: () => { if (!alive) return; paused = false; setTimeout(boot, 150); },
-    stop: () => { alive = false; try { rec?.abort(); } catch {} },
+    stop: () => { alive = false; earHooks.pause = earHooks.resume = () => {}; try { rec?.abort(); } catch {} },
   };
+  earHooks.pause = ctl.pause;
+  earHooks.resume = ctl.resume;
+  return ctl;
 }
 
 export type Ear = ReturnType<typeof startEar>;

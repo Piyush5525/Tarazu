@@ -7,7 +7,9 @@ import { BookOpen, Home, Store, Users, Link2, CalendarHeart, BadgeCheck, Play, M
 import { useEffect, useState, type ReactNode } from "react";
 import { useStore, type Lang } from "@/lib/store";
 import { LANGS, useT, type L } from "@/lib/i18n";
-import { speak } from "@/lib/voice";
+import { speak, stopSpeaking } from "@/lib/voice";
+import { PAGE_HELP } from "@/lib/tara";
+import { Volume2 } from "lucide-react";
 import Tara from "./Tara";
 
 const NAV: { href: string; icon: typeof Home; label: L }[] = [
@@ -72,7 +74,15 @@ function Onboarding({ onDone }: { onDone: () => void }) {
 export default function Shell({ children }: { children: ReactNode }) {
   const path = usePathname();
   const t = useT();
-  const { ready, init, lang, setLang } = useStore();
+  const { ready, init, lang, setLang, autoRead, setAutoRead } = useStore();
+  // Read-to-me mode: every screen introduces itself aloud as soon as it opens.
+  useEffect(() => {
+    if (!ready || !autoRead || !PAGE_HELP[path]) return;
+    const id = setTimeout(() => speak(PAGE_HELP[path][lang], lang), 700);
+    return () => { clearTimeout(id); stopSpeaking(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [path, autoRead, ready]);
+  const readLabel = t({ en: "Read every screen to me", hi: "हर पन्ना पढ़कर सुनाओ", bn: "প্রতিটা পাতা পড়ে শোনাও" });
   const [more, setMore] = useState(false);
   const [welcome, setWelcome] = useState(false);
 
@@ -94,14 +104,18 @@ export default function Shell({ children }: { children: ReactNode }) {
             <Image src="/assets/logo-tarazu.svg" alt="" width={40} height={40} priority />
             <span className="font-display text-2xl font-semibold tracking-tight">Tarazu</span>
           </Link>
-          <nav className="ml-6 hidden items-center gap-1 lg:flex" aria-label="Main">
+          <nav className="ml-4 hidden items-center gap-0.5 xl:flex" aria-label="Main">
             {NAV.map((n) => (
-              <Link key={n.href} href={n.href} className={`flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-bold transition ${active(n.href) ? "bg-ink text-ivory" : "text-ink-2 hover:bg-ink/5"}`}>
+              <Link key={n.href} href={n.href} className={`flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-full px-3 text-sm font-bold transition ${active(n.href) ? "bg-ink text-ivory" : "text-ink-2 hover:bg-ink/5"}`}>
                 <n.icon size={16} />{t(n.label)}
               </Link>
             ))}
           </nav>
-          <div className="ml-auto flex items-center rounded-full border border-line bg-white/70 p-1" role="group" aria-label="Language">
+          <button onClick={() => setAutoRead(!autoRead)} aria-pressed={autoRead} title={readLabel} aria-label={readLabel}
+            className={`ml-auto hidden h-11 items-center gap-2 rounded-full border px-3 text-sm font-bold transition sm:flex ${autoRead ? "border-verdigris bg-verdigris text-white" : "border-line bg-white/70 text-ink-2"}`}>
+            <Volume2 size={18} /><span className="hidden whitespace-nowrap 2xl:inline">{autoRead ? t({ en: "Reading aloud", hi: "पढ़कर सुना रही हूँ", bn: "পড়ে শোনাচ্ছি" }) : t({ en: "Read to me", hi: "पढ़कर सुनाओ", bn: "পড়ে শোনাও" })}</span>
+          </button>
+          <div className="ml-auto flex items-center rounded-full border border-line bg-white/70 p-1 sm:ml-0" role="group" aria-label="Language">
             {LANGS.map((l) => (
               <button key={l.id} onClick={() => setLang(l.id)} className={`min-h-10 rounded-full px-3 text-sm font-bold transition ${lang === l.id ? "gold-fill text-ink shadow" : "text-ink-2"}`}>{l.id === "en" ? "EN" : l.label}</button>
             ))}
@@ -109,7 +123,7 @@ export default function Shell({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <main className="mx-auto min-h-[70vh] max-w-7xl px-4 pb-40 pt-6 lg:pb-24">
+      <main className="mx-auto min-h-[70vh] max-w-7xl px-4 pb-40 pt-6 xl:pb-24">
         {ready ? children : (
           <div className="grid min-h-[60vh] place-items-center">
             <div className="text-center"><Image src="/assets/logo-tarazu.svg" alt="" width={84} height={84} className="floaty mx-auto" /><p className="mt-3 font-semibold text-ink-3">Opening the book…</p></div>
@@ -118,7 +132,7 @@ export default function Shell({ children }: { children: ReactNode }) {
       </main>
 
       {/* phone tab bar: four big targets + More */}
-      <nav className="safe-b fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 backdrop-blur lg:hidden" aria-label="Main">
+      <nav className="safe-b fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 backdrop-blur xl:hidden" aria-label="Main">
         <div className="mx-auto grid max-w-lg grid-cols-5">
           {tabs.map((n) => (
             <Link key={n.href} href={n.href} className={`flex min-h-[68px] flex-col items-center justify-center gap-1 text-[12px] font-bold ${active(n.href) ? "text-bahi" : "text-ink-3"}`}>
@@ -135,6 +149,10 @@ export default function Shell({ children }: { children: ReactNode }) {
               {rest.map((n) => (
                 <Link key={n.href} href={n.href} className={`flex min-h-14 items-center gap-3 rounded-2xl px-4 font-bold ${active(n.href) ? "bg-ink text-ivory" : "bg-ivory-2/70"}`}><n.icon size={22} />{t(n.label)}</Link>
               ))}
+              <button onClick={() => setAutoRead(!autoRead)} aria-pressed={autoRead} className={`col-span-2 flex min-h-14 items-center gap-3 rounded-2xl px-4 text-left font-bold ${autoRead ? "bg-verdigris text-white" : "border border-line bg-white"}`}>
+                <Volume2 size={22} /><span className="flex-1">{readLabel}</span>
+                <span className={`relative h-7 w-12 shrink-0 rounded-full transition ${autoRead ? "bg-white/40" : "bg-line"}`}><span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all ${autoRead ? "left-6" : "left-1"}`} /></span>
+              </button>
             </motion.div>
           )}
         </AnimatePresence>
