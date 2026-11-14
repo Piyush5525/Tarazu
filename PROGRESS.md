@@ -14,7 +14,7 @@
 
 - Real microphone input and spoken output (headless browser has neither). The code paths are the standard Web Speech API; test on the demo phone in Chrome. Bengali voice availability depends on the device.
 - 3D performance on a low-end phone (screenshots were software-rendered).
-- Tara's Gemini path end to end in the UI: the free tier was timing out / returning 503 during testing, so the offline fallback is what was observed.
+- Tara's Gemini path worked in the UI on `gemini-3.5-flash-lite` (~2 s, Hindi and English, passed the grounding guard). The larger free models timed out or returned 503 during testing, so free-tier availability on demo day is not guaranteed; the offline brain takes over automatically.
 
 ## Not built (from the master prompt)
 
