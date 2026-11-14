@@ -12,3 +12,4 @@ const Fallback = ({ h = "h-[420px]" }: { h?: string }) => (
 export const Balance3D = dynamic(() => import("./Balance3D"), { ssr: false, loading: () => <Fallback /> });
 export const GoldField = dynamic(() => import("./GoldField"), { ssr: false });
 export const Chain3D = dynamic(() => import("./Chain3D"), { ssr: false, loading: () => <div className="h-[150px]" /> });
+export const TaraAvatar = dynamic(() => import("./TaraAvatar"), { ssr: false });

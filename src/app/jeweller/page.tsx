@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle, BadgeIndianRupee, CalendarHeart, Check, FileSignature, Hourglass, Info, PackageCheck, Stamp, UserCheck, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { DemoNote, Grams, PageHead, Ring } from "@/components/ui";
+import { DemoNote, Grams, Guide, PageHead, Ring } from "@/components/ui";
 import { payClocks, useFacts } from "@/lib/facts";
 import { useT } from "@/lib/i18n";
 import { classify, fairBand, simulateSchedule } from "@/lib/ledger/analytics";
@@ -43,6 +43,11 @@ export default function JewellerPage() {
     <div>
       <PageHead kicker="Mehta Jewellers · Johari Bazaar, Jaipur" title={t({ en: "Jeweller Console", hi: "सेठ की मेज़", bn: "মালিকের টেবিল" })} sub={t({ en: "Every number here is computed by the ledger engine from co-signed entries.", hi: "यहाँ का हर अंक दोनों के दस्तख़त वाली एंट्री से इंजन निकालता है।", bn: "এখানকার প্রতিটা সংখ্যা দুজনের সই-করা এন্ট্রি থেকে ইঞ্জিন বের করে।" })} />
 
+      <Guide steps={[
+        { en: "Countersign entries your karigars have already signed.", hi: "जिन एंट्री पर कारीगर दस्तख़त कर चुका है, उन पर अपने दस्तख़त करो।", bn: "কারিগর যে এন্ট্রিতে সই করেছে, তাতে নিজের সই দাও।" },
+        { en: "Check the wedding order. If it is below 80%, share the work.", hi: "शादी का ऑर्डर देखो। 80% से कम हो तो काम बाँटो।", bn: "বিয়ের অর্ডার দেখো। 80%-এর কম হলে কাজ ভাগ করো।" },
+        { en: "Pay labour that has turned red, and settle flagged jobs.", hi: "जो मज़दूरी लाल हो गई है वह चुकाओ, और निशान लगे काम निपटाओ।", bn: "যে মজুরি লাল হয়েছে তা মেটাও, আর চিহ্নিত কাজ মিটিয়ে ফেলো।" },
+      ]} />
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         {[
           { icon: Users, label: "Gold out with karigars", v: <Grams mg={out} /> },

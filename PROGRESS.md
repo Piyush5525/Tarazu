@@ -10,6 +10,17 @@
   tamper detected and restored → passport shared and verified in lender view → Tara answers from ledger numbers.
 - No horizontal overflow at 390 px or 1366 px on any of the 8 screens.
 
+## Second pass (2026-11-14)
+
+- Tara is now a 3D character (blinks, follows the pointer, talks, tilts when listening). No language buttons: she answers in the language of each message (script, then romanised-word detection; Gemini returns its own language code for open questions).
+- Hands-free: once the microphone is allowed, saying "Tara" opens her from any screen; the rest of the sentence is the question, and she keeps listening about 11 s for a follow-up. Toggle is the ear icon in her header.
+- Gemini replies can carry a route, so open questions navigate too (only to known routes).
+- `/demo` is an auto-playing 7-scene film (narration optional); the click-path moved into collapsible presenter notes.
+- Guide strips ("what to do here") on karigar, jeweller, ledger and agent screens; "one job" journey on the home page.
+- Checked in a browser: typed Hinglish, Bengali and English each got a reply in the matching language; a wedding question in Hindi navigated to `/track`; no page errors; no overflow at 390 px.
+
+Limits to know: speech recognition must be told a language before it listens, so Tara listens in the language last used (Hindi mode also picks up English). To move to Bengali by voice, say "Bangla" once or type a Bengali message. Wake-word listening needs Chrome/Edge, an open tab, and uses the browser's online speech service.
+
 ## Not verified
 
 - Real microphone input and spoken output (headless browser has neither). The code paths are the standard Web Speech API; test on the demo phone in Chrome. Bengali voice availability depends on the device.

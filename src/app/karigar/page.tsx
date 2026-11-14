@@ -4,7 +4,7 @@ import { AlarmClock, Check, CheckCheck, Clock, GitCompareArrows, Mic, NotebookPe
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Balance3D } from "@/components/three/lazy";
-import { Grams, Speak } from "@/components/ui";
+import { Grams, Guide, Speak } from "@/components/ui";
 import { useFacts } from "@/lib/facts";
 import { tr, useT, type L } from "@/lib/i18n";
 import { findDivergence, type Divergence } from "@/lib/ledger/analytics";
@@ -232,15 +232,20 @@ function Book() {
       </div>
 
       <h1 className="text-3xl font-semibold sm:text-4xl">{t({ en: "Hello", hi: "नमस्ते", bn: "নমস্কার" })}, <span className="gold-text">{lang === "en" ? f.who.name.split(" ")[0] : f.who.nameLocal.split(" ")[0]}</span></h1>
-      <div className="mt-2"><Speak text={summary} /></div>
+      <div className="mb-4 mt-2"><Speak text={summary} /></div>
+      <Guide steps={[
+        { en: "Look at the big gold number: that is the gold with you.", hi: "बड़ा सुनहरा अंक देखो: इतना सोना तुम्हारे पास है।", bn: "বড় সোনালি সংখ্যাটা দেখো: এতটা সোনা তোমার কাছে।" },
+        { en: "Got new gold? Press the green microphone and say it.", hi: "नया सोना मिला? हरा माइक दबाकर बोल दो।", bn: "নতুন সোনা পেলে? সবুজ মাইক টিপে বলে দাও।" },
+        { en: "Something looks wrong? Press the red “My count is different”.", hi: "कुछ ग़लत लगे? लाल “मेरा हिसाब अलग है” दबाओ।", bn: "কিছু ভুল মনে হলে লাল “আমার হিসাব আলাদা” টিপো।" },
+      ]} />
 
       <div className="mt-5 grid gap-5 lg:grid-cols-2">
         <section data-tara="gold" className="card overflow-hidden p-5">
           <div className="text-lg font-bold text-ink-2">{t({ en: "Gold with you now", hi: "अभी तुम्हारे पास सोना", bn: "এখন তোমার কাছে সোনা" })}</div>
           <Grams mg={f.holdingMg} className="gold-text text-6xl font-bold sm:text-7xl" />
           <div className="text-sm text-ink-3">{t({ en: "pure gold, in open jobs", hi: "खरा सोना, चालू कामों में", bn: "খাঁটি সোনা, চালু কাজে" })}</div>
-          <Balance3D tilt={given ? -Math.min(f.holdingMg / given, 1) * 0.8 : 0} leftBeads={Math.max(2, Math.min(11, Math.round(given / 30000)))} rightBeads={Math.max(1, Math.round((given - f.holdingMg) / 30000))} sparkles={false} className="-my-4 h-[230px] w-full" />
-          <div className="grid grid-cols-2 gap-2 text-center text-sm font-bold"><span>{t({ en: "Given to you", hi: "तुम्हें दिया", bn: "তোমাকে দেওয়া" })}<br /><Grams mg={given} /></span><span>{t({ en: "You gave back", hi: "तुमने लौटाया", bn: "তুমি ফেরত দিলে" })}<br /><Grams mg={given - f.holdingMg} /></span></div>
+          <Balance3D tilt={given ? -Math.min(f.holdingMg / given, 1) * 0.8 : 0} leftBeads={Math.max(2, Math.min(11, Math.round(given / 30000)))} rightBeads={Math.max(1, Math.round((given - f.holdingMg) / 30000))} sparkles={false} className="-mt-3 h-[240px] w-full" />
+          <div className="mt-2 grid grid-cols-2 gap-2 border-t border-line pt-3 text-center text-sm font-bold"><span>{t({ en: "Given to you", hi: "तुम्हें दिया", bn: "তোমাকে দেওয়া" })}<br /><Grams mg={given} /></span><span>{t({ en: "You gave back", hi: "तुमने लौटाया", bn: "তুমি ফেরত দিলে" })}<br /><Grams mg={given - f.holdingMg} /></span></div>
         </section>
 
         <div className="grid gap-5">

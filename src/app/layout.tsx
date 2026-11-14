@@ -21,8 +21,8 @@ export const viewport: Viewport = { width: "device-width", initialScale: 1, them
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${jakarta.variable} ${jbmono.variable} ${bengali.variable} ${deva.variable}`}>
-      <body>
+    <html lang="en" suppressHydrationWarning className={`${fraunces.variable} ${jakarta.variable} ${jbmono.variable} ${bengali.variable} ${deva.variable}`}>
+      <body suppressHydrationWarning>
         <Shell>{children}</Shell>
       </body>
     </html>

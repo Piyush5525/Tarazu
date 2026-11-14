@@ -95,6 +95,48 @@ export function Ring({ bp, size = 132, label }: { bp: number; size?: number; lab
   );
 }
 
+/** "What do I do here?" strip at the top of a screen: three plain steps, with a Listen button. */
+export function Guide({ steps }: { steps: { en: string; hi: string; bn: string }[] }) {
+  const t = useT();
+  return (
+    <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-gold/40 bg-gold-2/15 p-3 sm:flex-row sm:items-center">
+      <div className="flex shrink-0 items-center gap-2 text-sm font-extrabold uppercase tracking-wide text-gold-deep">{t({ en: "What to do here", hi: "यहाँ क्या करना है", bn: "এখানে কী করতে হবে" })}</div>
+      <ol className="grid flex-1 gap-2 sm:grid-cols-3">
+        {steps.map((s, i) => (
+          <li key={i} className="flex items-start gap-2 text-[15px] leading-snug">
+            <span className="num grid h-6 w-6 shrink-0 place-items-center rounded-full bg-ink text-xs font-bold text-ivory">{i + 1}</span>
+            <span>{t(s)}</span>
+          </li>
+        ))}
+      </ol>
+      <Speak text={steps.map((s, i) => `${i + 1}. ${t(s)}`).join(" ")} label={false} className="shrink-0 self-start !px-3 sm:self-center" />
+    </div>
+  );
+}
+
+/** The path of one job's gold, with a bead that travels it. Numbers are passed in from the engine. */
+export function GoldJourney({ stops }: { stops: { icon: ReactNode; title: string; value: string; note: string }[] }) {
+  return (
+    <div className="card relative overflow-hidden p-5 sm:p-7">
+      <div className="absolute left-[10%] right-[10%] top-[58px] hidden h-1 rounded-full bg-line md:block sm:top-[66px]">
+        <motion.span className="gold-fill absolute -top-2 h-5 w-5 rounded-full shadow-[var(--shadow-gold)]" animate={{ left: ["0%", "100%"] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", repeatDelay: 0.8 }} />
+      </div>
+      <ol className="relative grid gap-5 md:grid-cols-5">
+        {stops.map((s, i) => (
+          <motion.li key={i} className="flex items-center gap-4 md:flex-col md:text-center" initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.12 }}>
+            <span className="gold-fill relative z-10 grid h-16 w-16 shrink-0 place-items-center rounded-full text-ink shadow-[var(--shadow-gold)] ring-4 ring-paper">{s.icon}</span>
+            <span>
+              <span className="block font-bold">{s.title}</span>
+              <span className="num block text-xl font-bold gold-text">{s.value}</span>
+              <span className="block text-sm text-ink-3">{s.note}</span>
+            </span>
+          </motion.li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
 export function DemoNote({ children }: { children: ReactNode }) {
   return <p className="mt-2 text-xs text-ink-3">{children}</p>;
 }

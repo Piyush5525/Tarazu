@@ -4,7 +4,7 @@ import { AlertOctagon, CheckCircle2, Hourglass, PenLine, ShieldAlert, Stamp, Und
 import QRCode from "qrcode";
 import { useEffect, useMemo, useState } from "react";
 import { Chain3D } from "@/components/three/lazy";
-import { PageHead, Speak } from "@/components/ui";
+import { Guide, PageHead, Speak } from "@/components/ui";
 import { useT } from "@/lib/i18n";
 import { daySeal, eventFine, verifyChain } from "@/lib/ledger/engine";
 import { KARIGARS } from "@/lib/ledger/seed";
@@ -35,6 +35,11 @@ export default function LedgerPage() {
         sub={t({ en: "Append-only. Each entry is hashed with the one before it and signed by both parties. Corrections are new lines, never edits.", hi: "इसमें सिर्फ़ जोड़ा जाता है। हर एंट्री पिछली से बँधी है और दोनों के दस्तख़त वाली है। सुधार नई लाइन होता है, काट-छाँट नहीं।", bn: "এতে শুধু যোগ হয়। প্রতিটা এন্ট্রি আগেরটার সাথে বাঁধা, দুজনের সই-করা। সংশোধন মানে নতুন লাইন, কাটাকুটি নয়।" })}
         right={<Speak text={said} />} />
 
+      <Guide steps={[
+        { en: "Each gold ring is one entry, locked to the one before it.", hi: "हर सुनहरी कड़ी एक एंट्री है, पिछली से बँधी हुई।", bn: "প্রতিটা সোনালি কড়া একটা এন্ট্রি, আগেরটার সাথে বাঁধা।" },
+        { en: "Press “secretly edit” to see what happens to a changed entry.", hi: "“चुपके से बदलो” दबाकर देखो, बदली हुई एंट्री का क्या होता है।", bn: "“চুপিচুপি বদলাও” টিপে দেখো, বদলানো এন্ট্রির কী হয়।" },
+        { en: "The Day Seal is one code for the whole day. Both sides get it.", hi: "दिन की मुहर पूरे दिन का एक कोड है। दोनों को मिलता है।", bn: "দিনের সিল হলো সারাদিনের একটা কোড। দুজনেই পায়।" },
+      ]} />
       <section data-tara="chain" className={`card overflow-hidden p-4 ${check.ok ? "" : "!border-terracotta border-2"}`}>
         <div className="flex flex-wrap items-center gap-3">
           {check.ok

@@ -2,9 +2,11 @@
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, BadgeCheck, CalendarHeart, Check, GitCompareArrows, Hammer, Landmark, Mic, Ear, PenLine, Play, Scale, ShieldCheck, Store, Heart, Hand, RotateCcw } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { HandCoins, PackageCheck } from "lucide-react";
+import { fineMg, grams, pct, ratioBp } from "@/lib/ledger/units";
 import { Balance3D, GoldField } from "@/components/three/lazy";
-import { Reveal, Speak, Tilt } from "@/components/ui";
+import { GoldJourney, Reveal, Speak, Tilt } from "@/components/ui";
 import { useT, type L } from "@/lib/i18n";
 
 const IDEAS: { icon: typeof Scale; href: string; tag: string; title: L; body: L }[] = [
@@ -27,6 +29,11 @@ export default function HomePage() {
   const [pans, setPans] = useState({ left: 6, right: 4 });
   const diff = pans.right - pans.left;
   const level = diff === 0;
+  // Scenario A, computed by the ledger engine (not typed in)
+  const journey = useMemo(() => {
+    const issued = fineMg(250_000, 9160), loss = issued - fineMg(238_400, 9160) - fineMg(7_100, 8500);
+    return { issued, loss, lossBp: ratioBp(loss, issued) };
+  }, []);
   const heroLine = t({ en: "Gold moves on trust. Tarazu makes it move on proof, and gives the weaker side the same book.", hi: "सोना भरोसे पर चलता है। तराज़ू उसे सबूत पर चलाता है, और कमज़ोर पक्ष को भी वही बही देता है।", bn: "সোনা চলে ভরসায়। তরাজু তাকে চালায় প্রমাণে, আর দুর্বল পক্ষকেও একই খাতা দেয়।" });
 
   return (
@@ -69,6 +76,23 @@ export default function HomePage() {
           </div>
           <button onClick={() => setPans({ left: 6, right: 4 })} className="mx-auto mt-2 flex min-h-12 items-center gap-2 px-4 text-sm font-bold text-ink-3"><RotateCcw size={16} />{t({ en: "Start again", hi: "फिर से", bn: "আবার শুরু" })}</button>
         </motion.div>
+      </section>
+
+      {/* ONE JOB, START TO FINISH */}
+      <section className="mt-16">
+        <Reveal>
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+            <h2 className="text-2xl font-semibold sm:text-4xl">{t({ en: "One job, from gold to signature", hi: "एक काम, सोने से दस्तख़त तक", bn: "একটা কাজ, সোনা থেকে সই পর্যন্ত" })}</h2>
+            <span className="chip chip-bahi">{t({ en: "Demo job J-1042", hi: "डेमो काम J-1042", bn: "ডেমো কাজ J-1042" })}</span>
+          </div>
+          <GoldJourney stops={[
+            { icon: <HandCoins size={28} />, title: t({ en: "Gold is given", hi: "सोना दिया गया", bn: "সোনা দেওয়া হলো" }), value: `${grams(250_000)} g`, note: t({ en: `22 carat · ${grams(journey.issued)} g pure`, hi: `22 कैरेट · ${grams(journey.issued)} ग्राम खरा`, bn: `২২ ক্যারেট · ${grams(journey.issued)} গ্রাম খাঁটি` }) },
+            { icon: <Hammer size={28} />, title: t({ en: "Karigar makes it", hi: "कारीगर बनाता है", bn: "কারিগর বানায়" }), value: t({ en: "Bridal haar", hi: "ब्राइडल हार", bn: "ব্রাইডাল হার" }), note: t({ en: "limit agreed in writing: 3.00%", hi: "छीजत की सीमा लिखकर तय: 3.00%", bn: "ক্ষয়ের সীমা লিখে ঠিক: 3.00%" }) },
+            { icon: <PackageCheck size={28} />, title: t({ en: "It comes back", hi: "वापस आता है", bn: "ফেরত আসে" }), value: `${grams(238_400)} g`, note: t({ en: `+ ${grams(7_100)} g scrap`, hi: `+ ${grams(7_100)} ग्राम चूरा`, bn: `+ ${grams(7_100)} গ্রাম গুঁড়ো` }) },
+            { icon: <Scale size={28} />, title: t({ en: "The scale checks", hi: "तराज़ू जाँचता है", bn: "দাঁড়িপাল্লা মেলায়" }), value: `${pct(journey.lossBp)}%`, note: t({ en: `lost ${grams(journey.loss)} g · inside the limit`, hi: `${grams(journey.loss)} ग्राम घटा · सीमा के अंदर`, bn: `${grams(journey.loss)} গ্রাম কমল · সীমার ভেতরে` }) },
+            { icon: <PenLine size={28} />, title: t({ en: "Both sign", hi: "दोनों के दस्तख़त", bn: "দুজনের সই" }), value: "2 / 2", note: t({ en: "locked in the chain", hi: "ज़ंजीर में बंद", bn: "শিকলে আটকে গেল" }) },
+          ]} />
+        </Reveal>
       </section>
 
       {/* THE HUMAN STORY */}

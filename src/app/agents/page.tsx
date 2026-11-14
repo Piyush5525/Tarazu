@@ -4,7 +4,7 @@ import { Ban, Check, Gavel, Play, Scale, ShieldCheck, Store, Hammer, Wrench, Bug
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Balance3D } from "@/components/three/lazy";
-import { Grams, PageHead, Speak } from "@/components/ui";
+import { Grams, Guide, PageHead, Speak } from "@/components/ui";
 import { tr, useT } from "@/lib/i18n";
 import { classify, fairBand, groundingGuard, proposeAtMedian } from "@/lib/ledger/analytics";
 import { reconcile } from "@/lib/ledger/engine";
@@ -73,6 +73,11 @@ export default function AgentRoom() {
       <PageHead kicker="Agent Room · पंचायत" title={t({ en: "Three agents argue. Two humans decide.", hi: "तीन एजेंट बहस करते हैं। फ़ैसला दो इंसान करते हैं।", bn: "তিন এজেন্ট তর্ক করে। সিদ্ধান্ত নেয় দুজন মানুষ।" })}
         sub={t({ en: "Rafiq's temple haar, J-1043. The jeweller says he lost too much gold. Is that fair?", hi: "रफ़ीक़ का टेम्पल हार, J-1043। सेठ का कहना है कि सोना ज़्यादा घटा। क्या यह सही है?", bn: "রফিকের টেম্পল হার, J-1043। মালিক বলছে সোনা বেশি কমেছে। এটা কি ন্যায্য?" })} />
 
+      <Guide steps={[
+        { en: "Press Start and watch the three agents make their case.", hi: "शुरू दबाओ और तीनों एजेंट की दलील देखो।", bn: "শুরু টিপে তিন এজেন্টের যুক্তি দেখো।" },
+        { en: "Check the green band: that is the normal loss for this work.", hi: "हरी पट्टी देखो: इस काम में इतनी छीजत आम है।", bn: "সবুজ পট্টি দেখো: এই কাজে এতটা ক্ষয় স্বাভাবিক।" },
+        { en: "If the offer is fair, both sign. The scale becomes level.", hi: "प्रस्ताव सही लगे तो दोनों दस्तख़त करो। तराज़ू बराबर हो जाएगा।", bn: "প্রস্তাব ন্যায্য হলে দুজনে সই করো। দাঁড়িপাল্লা সমান হবে।" },
+      ]} />
       <div className="grid gap-5 lg:grid-cols-[1fr_1.15fr]">
         <div className="space-y-5">
           <section className="card overflow-hidden p-5">

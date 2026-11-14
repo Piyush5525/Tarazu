@@ -46,11 +46,11 @@ export function speak(text: string, lang: Lang, onEnd?: () => void) {
   synth.speak(u);
 }
 
-type Rec = { start: () => void; stop: () => void; abort: () => void; lang: string; interimResults: boolean; continuous: boolean; maxAlternatives: number;
+export type Rec = { start: () => void; stop: () => void; abort: () => void; lang: string; interimResults: boolean; continuous: boolean; maxAlternatives: number;
   onresult: ((e: { results: ArrayLike<ArrayLike<{ transcript: string }> & { isFinal: boolean }> }) => void) | null;
   onend: (() => void) | null; onerror: ((e: { error: string }) => void) | null };
 
-const recCtor = () => {
+export const recCtor = () => {
   if (typeof window === "undefined") return null;
   const w = window as unknown as { SpeechRecognition?: new () => Rec; webkitSpeechRecognition?: new () => Rec };
   return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;

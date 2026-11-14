@@ -79,7 +79,7 @@ const INTENTS: Intent[] = [
     }),
   },
   { // record gold received
-    re: /sona mila|gold (received|got)|mila hai|record|likh|सोना मिला|मिला है|लिखो|दर्ज|সোনা পেলাম|পেয়েছি|লেখো|\d+\s*(g\b|gram|ग्राम|গ্রাম)/i,
+    re: /sona mila|gold (received|got)|mila hai|record (the |my )?gold|likh ?(do|lo)|सोना मिला|मिला है|लिखो|दर्ज|সোনা পেলাম|পেয়েছি|লেখো|\d+\s*(g\b|gram|ग्राम|গ্রাম)/i,
     run: (c) => ({
       go: "/karigar", spot: "mic",
       say: pick(c.lang, {
