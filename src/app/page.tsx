@@ -45,14 +45,14 @@ export default function HomePage() {
       <GoldField />
 
       {/* HERO */}
-      <section className="grid items-center gap-4 pt-2 lg:grid-cols-[1.02fr_1fr] lg:gap-8 lg:pt-8">
+      <section className="grid items-center gap-4 pt-2 lg:grid-cols-[1.02fr_1fr] lg:gap-8 lg:pt-8 2xl:gap-16 2xl:pt-12">
         <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
           <span className="chip chip-bahi mb-4">दोनों साक्षी · দুই সাক্ষী · both witnesses</span>
-          <h1 className="text-[2.6rem] font-semibold sm:text-6xl lg:text-[4.2rem]">
+          <h1 className="text-[2.5rem] font-semibold sm:text-6xl lg:text-[4.2rem] 2xl:text-[5.4rem]">
             {t({ en: "The gold ledger", hi: "सोने की वह बही", bn: "সোনার সেই খাতা" })}{" "}
             <span className="gold-text italic">{t({ en: "both sides sign.", hi: "जिस पर दोनों के दस्तख़त हों।", bn: "যাতে দুজনেরই সই।" })}</span>
           </h1>
-          <p className="mt-5 max-w-xl text-lg text-ink-2 sm:text-xl">{heroLine}</p>
+          <p className="mt-5 max-w-xl text-lg text-ink-2 sm:text-xl 2xl:max-w-2xl 2xl:text-2xl">{heroLine}</p>
           <div className="mt-4"><Speak text={heroLine} /></div>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link href="/karigar" className="btn btn-gold btn-xl"><Hammer size={22} />{t({ en: "Open my book", hi: "मेरा खाता खोलो", bn: "আমার খাতা খোলো" })}</Link>
@@ -64,7 +64,7 @@ export default function HomePage() {
             <span className="chip">हिंदी · বাংলা · English</span>
           </div>
           {/* live figures from the ledger behind this page */}
-          <dl className="mt-7 grid max-w-xl grid-cols-3 divide-x divide-line rounded-2xl border border-line bg-paper/70 text-center backdrop-blur">
+          <dl className="mt-7 grid max-w-xl grid-cols-3 2xl:max-w-2xl divide-x divide-line rounded-2xl border border-line bg-paper/70 text-center backdrop-blur">
             {[
               { v: String(chain.length), l: t({ en: "entries, each signed", hi: "एंट्री, हर एक पर दस्तख़त", bn: "এন্ট্রি, প্রতিটায় সই" }) },
               { v: intact ? "100%" : "!", l: t({ en: "of the chain verified", hi: "ज़ंजीर जाँची हुई", bn: "শিকল যাচাই করা" }) },
@@ -76,18 +76,18 @@ export default function HomePage() {
         </motion.div>
 
         <motion.div initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.9, delay: 0.15 }} className="relative order-first lg:order-none">
-          <Balance3D tilt={diff / 4} leftBeads={pans.left} rightBeads={pans.right} onPan={(side) => setPans((p) => ({ ...p, [side]: Math.min(p[side] + 1, 12) }))} className="h-[300px] w-full sm:h-[520px]" />
+          <Balance3D tilt={diff / 4} leftBeads={pans.left} rightBeads={pans.right} onPan={(side) => setPans((p) => ({ ...p, [side]: Math.min(p[side] + 1, 12) }))} className="h-[300px] w-full sm:h-[520px] 2xl:h-[640px]" />
           {/* what the scale stands for, floating around it (wide screens only: no room on a phone) */}
           <div className="pointer-events-none absolute inset-0 hidden xl:block" aria-hidden>
-            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.1 }} className="floaty absolute left-0 top-[26%] flex items-center gap-2 rounded-2xl border border-line bg-paper/90 px-3 py-2 text-sm font-bold shadow-lg backdrop-blur">
+            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.1 }} className="floaty absolute left-0 top-[3%] flex items-center gap-2 rounded-2xl border border-line bg-paper/90 px-3 py-2 text-sm font-bold shadow-lg backdrop-blur">
               <span className="grid h-8 w-8 place-items-center rounded-full bg-verdigris text-white"><Check size={16} /></span>
               <span>{t({ en: "Karigar signed", hi: "कारीगर के दस्तख़त", bn: "কারিগরের সই" })}<span className="block text-[11px] font-semibold text-ink-3">Bablu Maity</span></span>
             </motion.div>
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.5 }} className="floaty absolute right-0 top-[14%] flex items-center gap-2 rounded-2xl border border-line bg-paper/90 px-3 py-2 text-sm font-bold shadow-lg backdrop-blur" style={{ animationDelay: "1.2s" }}>
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.5 }} className="floaty absolute right-0 top-[3%] flex items-center gap-2 rounded-2xl border border-line bg-paper/90 px-3 py-2 text-sm font-bold shadow-lg backdrop-blur" style={{ animationDelay: "1.2s" }}>
               <span className="grid h-8 w-8 place-items-center rounded-full bg-bahi text-white"><Check size={16} /></span>
               <span>{t({ en: "Jeweller signed", hi: "सेठ के दस्तख़त", bn: "মালিকের সই" })}<span className="block text-[11px] font-semibold text-ink-3">Mehta Jewellers</span></span>
             </motion.div>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.9 }} className="floaty absolute bottom-[30%] right-[2%] flex items-center gap-2 rounded-2xl border border-gold/50 bg-ink px-3 py-2 text-sm font-bold text-ivory shadow-lg" style={{ animationDelay: "2.1s" }}>
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.9 }} className="floaty absolute bottom-[27%] left-0 flex items-center gap-2 rounded-2xl border border-gold/50 bg-ink px-3 py-2 text-sm font-bold text-ivory shadow-lg" style={{ animationDelay: "2.1s" }}>
               <ShieldCheck size={18} className="text-gold-2" />
               <span>{t({ en: "Locked in the chain", hi: "ज़ंजीर में बंद", bn: "শিকলে আটকানো" })}<span className="num block text-[11px] font-semibold text-ivory/60">{chain.length ? chain[chain.length - 1].hash.slice(0, 14) : ""}…</span></span>
             </motion.div>

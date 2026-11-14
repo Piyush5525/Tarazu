@@ -50,11 +50,11 @@ export default function JewellerPage() {
       ]} />
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         {[
-          { icon: Users, label: "Gold out with karigars", v: <Grams mg={out} /> },
-          { icon: PackageCheck, label: "Open orders", v: jobs.filter((j) => j.status === "OPEN").length },
-          { icon: FileSignature, label: "Awaiting your signature", v: forMe.length, hot: forMe.length > 0 },
-          { icon: AlertTriangle, label: "Open disputes", v: disputes, hot: disputes > 0 },
-          { icon: BadgeIndianRupee, label: "Your payer score (median days)", v: f.payerDays },
+          { icon: Users, label: t({ en: "Gold out with karigars", hi: "कारीगरों के पास सोना", bn: "কারিগরদের কাছে সোনা" }), v: <Grams mg={out} /> },
+          { icon: PackageCheck, label: t({ en: "Open orders", hi: "चालू ऑर्डर", bn: "চালু অর্ডার" }), v: jobs.filter((j) => j.status === "OPEN").length },
+          { icon: FileSignature, label: t({ en: "Waiting for your signature", hi: "आपके दस्तख़त बाक़ी", bn: "আপনার সই বাকি" }), v: forMe.length, hot: forMe.length > 0 },
+          { icon: AlertTriangle, label: t({ en: "Open disputes", hi: "चालू झगड़े", bn: "চলতি বিবাদ" }), v: disputes, hot: disputes > 0 },
+          { icon: BadgeIndianRupee, label: t({ en: "Your payer score: usual days to pay", hi: "आपका भुगतान स्कोर: आम तौर पर कितने दिन में", bn: "আপনার পেমেন্ট স্কোর: সাধারণত কত দিনে" }), v: f.payerDays },
         ].map((k, i) => (
           <div key={i} className={`card p-4 ${k.hot ? "!border-gold border-2" : ""} ${i === 4 ? "col-span-2 lg:col-span-1" : ""}`}>
             <k.icon size={20} className="text-gold-deep" />
@@ -66,9 +66,9 @@ export default function JewellerPage() {
 
       <div className="mt-5 grid gap-5 lg:grid-cols-[1.25fr_1fr]">
         <section className="card p-5">
-          <h2 className="flex items-center gap-2 text-2xl font-semibold"><Stamp className="text-bahi" />Countersign queue</h2>
-          <p className="text-sm text-ink-3">Pending entries are visible to both sides and excluded from every balance. They expire in 24h.</p>
-          {forMe.length + forKarigar.length === 0 && <div className="mt-4 rounded-2xl bg-ivory-2/70 p-6 text-center text-ink-3"><Check className="mx-auto mb-1" />Nothing waiting. Record gold from <Link className="inline-flex min-h-11 items-center font-bold text-bahi underline" href="/karigar">the karigar&apos;s book</Link> to see an entry arrive.</div>}
+          <h2 className="flex items-center gap-2 text-2xl font-semibold"><Stamp className="text-bahi" />{t({ en: "Entries to countersign", hi: "दस्तख़त के लिए एंट्री", bn: "সইয়ের জন্য এন্ট্রি" })}</h2>
+          <p className="text-sm text-ink-3">{t({ en: "Both sides can see a pending entry, but it counts in no balance until both have signed. It expires in 24 hours.", hi: "अधूरी एंट्री दोनों को दिखती है, पर दोनों के दस्तख़त तक किसी हिसाब में नहीं गिनी जाती। 24 घंटे में ख़त्म हो जाती है।", bn: "অসম্পূর্ণ এন্ট্রি দুজনেই দেখে, কিন্তু দুজনের সই না হলে কোনো হিসাবে ধরা হয় না। 24 ঘণ্টায় শেষ হয়ে যায়।" })}</p>
+          {forMe.length + forKarigar.length === 0 && <div className="mt-4 rounded-2xl bg-ivory-2/70 p-6 text-center text-ink-3"><Check className="mx-auto mb-1" />{t({ en: "Nothing is waiting. When a karigar records gold, it appears here.", hi: "अभी कुछ बाक़ी नहीं। कारीगर सोना दर्ज करेगा तो यहाँ दिखेगा।", bn: "এখন কিছু বাকি নেই। কারিগর সোনা লিখলে এখানে দেখা যাবে।" })}<br /><Link className="inline-flex min-h-11 items-center font-bold text-bahi underline" href="/karigar">{t({ en: "Open the karigar's book", hi: "कारीगर का खाता खोलो", bn: "কারিগরের খাতা খোলো" })}</Link></div>}
           <AnimatePresence>
             {forMe.map((e) => (
               <motion.div key={e.id} layout initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, scale: 0.9 }} className="mt-3 flex flex-wrap items-center gap-3 rounded-2xl border-2 border-gold bg-gold-2/15 p-4">
@@ -76,7 +76,7 @@ export default function JewellerPage() {
                   <div className="flex flex-wrap items-center gap-2"><span className="chip chip-bahi">{e.id}</span><span className="chip">{e.jobId}</span><span className="chip chip-ok"><UserCheck size={13} />{KARIGARS.find((k) => k.id === e.karigarId)?.name} signed</span></div>
                   <div className="mt-1 font-bold">{what(e)}</div>
                 </div>
-                <button onClick={() => countersign(e.id)} className="btn btn-gold"><Stamp size={20} />Countersign</button>
+                <button onClick={() => countersign(e.id)} data-act="countersign" className="btn btn-gold w-full sm:w-auto"><Stamp size={20} />{t({ en: "Countersign", hi: "दस्तख़त करो", bn: "সই করো" })}</button>
               </motion.div>
             ))}
           </AnimatePresence>
@@ -95,26 +95,26 @@ export default function JewellerPage() {
         </section>
 
         <section className="card p-5" data-tara="guardian">
-          <h2 className="flex items-center gap-2 text-2xl font-semibold"><CalendarHeart className="text-terracotta" />Deadline Guardian</h2>
+          <h2 className="flex items-center gap-2 text-2xl font-semibold"><CalendarHeart className="text-terracotta" />{t({ en: "Wedding date guard", hi: "शादी की तारीख़ का पहरा", bn: "বিয়ের তারিখের পাহারা" })}</h2>
           <p className="text-sm text-ink-3">Aarti&apos;s wedding · J-1042 · {f.daysToWedding} days left · stage: setting → polish → hallmark (2 working days) → delivery</p>
           <div className="mt-3 flex items-center gap-5">
             <Ring bp={f.sim.onTimeBp} label="on time" />
             <div className="text-sm">
-              <div className={`chip ${f.sim.onTimeBp < 8000 ? "chip-warn" : "chip-ok"}`}>{f.sim.onTimeBp < 8000 ? "Below 80%. Act now." : "Protected"}</div>
+              <div className={`chip whitespace-nowrap ${f.sim.onTimeBp < 8000 ? "chip-warn" : "chip-ok"}`}>{f.sim.onTimeBp < 8000 ? t({ en: "At risk. Act now.", hi: "ख़तरा। अभी कुछ करो।", bn: "ঝুঁকি। এখনই কিছু করো।" }) : t({ en: "Protected", hi: "सुरक्षित", bn: "সুরক্ষিত" })}</div>
               <div className="mt-2 text-ink-2">{f.sim.runs.toLocaleString()} seeded simulations<br />typical finish: day <b className="num">{f.sim.p50Days}</b>, slow case: day <b className="num">{f.sim.p90Days}</b></div>
             </div>
           </div>
           <div className="mt-4 space-y-3">
             <div className="rounded-2xl border border-line bg-white/70 p-4">
-              <div className="font-bold">1. Move the earrings to Suresh Soni</div>
-              <div className="text-sm text-ink-2">Bablu has 4 open orders; Suresh has capacity. Never reassigned silently: Suresh must accept.</div>
-              {rebalance === "none" && <button onClick={() => setRebalance("requested")} className="btn btn-ink mt-3 w-full">Ask Suresh</button>}
+              <div className="font-bold">1. {t({ en: "Give the earrings to Suresh Soni", hi: "झुमके सुरेश सोनी को दो", bn: "দুল সুরেশ সোনিকে দাও" })}</div>
+              <div className="text-sm text-ink-2">{t({ en: "Bablu has 4 open orders; Suresh has time. Nobody is moved silently: Suresh must say yes.", hi: "बबलू के पास 4 काम हैं; सुरेश के पास समय है। चुपके से काम नहीं बदलता: सुरेश की हाँ ज़रूरी है।", bn: "বাবলুর হাতে 4টা কাজ; সুরেশের সময় আছে। চুপিচুপি কাজ বদলায় না: সুরেশের হ্যাঁ লাগবে।" })}</div>
+              {rebalance === "none" && <button onClick={() => setRebalance("requested")} data-act="ask-suresh" className="btn btn-ink mt-3 w-full">{t({ en: "Ask Suresh", hi: "सुरेश से पूछो", bn: "সুরেশকে জিজ্ঞেস করো" })}</button>}
               {rebalance === "requested" && <button onClick={() => setRebalance("accepted")} className="btn btn-yes mt-3 w-full"><Check size={20} />On Suresh&apos;s phone: “हाँ, मैं ले लूँगा”</button>}
               {rebalance === "accepted" && <div className="chip chip-ok mt-3"><Check size={14} />Accepted by Suresh. Simulation re-run.</div>}
             </div>
             <div className="rounded-2xl border border-line bg-white/70 p-4">
-              <div className="font-bold">2. Tell the customer early, with date options</div>
-              <div className="mt-1 text-sm text-ink-2">Delivery one day later: <b className="num">{Math.round(plus[0] / 100)}%</b> · two days later: <b className="num">{Math.round(plus[1] / 100)}%</b></div>
+              <div className="font-bold">2. {t({ en: "Tell the customer early, with other dates", hi: "ग्राहक को पहले बताओ, दूसरी तारीख़ों के साथ", bn: "খদ্দেরকে আগে জানাও, অন্য তারিখসহ" })}</div>
+              <div className="mt-1 text-sm text-ink-2">{t({ en: "One day later", hi: "एक दिन बाद", bn: "এক দিন পরে" })}: <b className="num">{Math.round(plus[0] / 100)}%</b> · {t({ en: "two days later", hi: "दो दिन बाद", bn: "দুই দিন পরে" })}: <b className="num">{Math.round(plus[1] / 100)}%</b></div>
               <Link href="/track" className="mt-1 inline-flex min-h-11 items-center text-sm font-bold text-bahi underline">See what Aarti sees</Link>
             </div>
           </div>
@@ -123,7 +123,7 @@ export default function JewellerPage() {
       </div>
 
       <section className="card mt-5 p-5">
-        <h2 className="text-2xl font-semibold">Karigars</h2>
+        <h2 className="text-2xl font-semibold">{t({ en: "Your karigars", hi: "आपके कारीगर", bn: "আপনার কারিগররা" })}</h2>
         <div className="mt-3 grid gap-3 md:grid-cols-3">
           {KARIGARS.map((k) => {
             const clocks = payClocks(chain, k.id, f.now);
@@ -131,11 +131,11 @@ export default function JewellerPage() {
             return (
               <div key={k.id} className="rounded-2xl border border-line bg-white/70 p-4">
                 <div className="flex items-center gap-3"><span className="gold-fill grid h-12 w-12 place-items-center rounded-full font-display text-xl font-semibold">{k.name[0]}</span><div><div className="font-bold">{k.name}</div><div className="text-xs text-ink-3">{k.nameLocal} · {k.tier} · since {k.since}</div></div></div>
-                <div className="mt-3 grid grid-cols-2 gap-2 text-sm"><div><div className="text-xs text-ink-3">Holding (fine)</div><Grams mg={holdingFine(k.id, jobs, chain)} className="text-lg font-bold" /></div><div><div className="text-xs text-ink-3">Open jobs</div><div className="num text-lg font-bold">{jobs.filter((j) => j.karigarId === k.id && j.status === "OPEN").length}</div></div></div>
+                <div className="mt-3 grid grid-cols-2 gap-2 text-sm"><div><div className="text-xs text-ink-3">{t({ en: "Gold with him (pure)", hi: "उसके पास सोना (खरा)", bn: "তার কাছে সোনা (খাঁটি)" })}</div><Grams mg={holdingFine(k.id, jobs, chain)} className="text-lg font-bold" /></div><div><div className="text-xs text-ink-3">{t({ en: "Open jobs", hi: "चालू काम", bn: "চালু কাজ" })}</div><div className="num text-lg font-bold">{jobs.filter((j) => j.karigarId === k.id && j.status === "OPEN").length}</div></div></div>
                 {clocks.map((c) => (
                   <div key={c.eventId} className={`mt-3 rounded-xl p-3 text-sm ${c.late ? "bg-terracotta/10" : "bg-ivory-2"}`}>
                     <div className={`font-bold ${c.late ? "text-terracotta" : ""}`}>{rupees(c.amountPaise)} labour · {c.jobId} · day {c.elapsedDays} of {c.promisedDays}</div>
-                    <button disabled={paying} onClick={() => propose("PAYMENT_MADE", c.jobId, k.id, { amountPaise: c.amountPaise, note: "mock UPI" }, "jeweller")} className="btn btn-ink mt-2 w-full !min-h-12">{paying ? "Waiting for karigar to confirm receipt" : "Pay now (mock UPI)"}</button>
+                    <button disabled={paying} onClick={() => propose("PAYMENT_MADE", c.jobId, k.id, { amountPaise: c.amountPaise, note: "mock UPI" }, "jeweller")} className="btn btn-ink mt-2 w-full !min-h-12">{paying ? t({ en: "Waiting for him to confirm", hi: "उसकी हाँ का इंतज़ार", bn: "তার হ্যাঁ-র অপেক্ষা" }) : t({ en: "Pay now (demo UPI)", hi: "अभी चुकाओ (डेमो UPI)", bn: "এখনই দাও (ডেমো UPI)" })}</button>
                   </div>
                 ))}
               </div>
@@ -146,13 +146,13 @@ export default function JewellerPage() {
 
       <section className="card mt-5 p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-2xl font-semibold">Orders &amp; reconciliation</h2>
+          <h2 className="text-2xl font-semibold">{t({ en: "Every order, weighed", hi: "हर ऑर्डर का हिसाब", bn: "প্রতিটা অর্ডারের হিসাব" })}</h2>
           <button disabled={brideRecon.issuedFine === 0 || brideRecon.finishedFine > 0 || returnPending} onClick={() => { propose("RECEIVE_FINISHED", "J-1042", "bablu", { netMg: 238_400, purityBp: 9160 }, "jeweller"); propose("RECEIVE_SCRAP", "J-1042", "bablu", { netMg: 7_100, purityBp: 8500 }, "jeweller"); }} className="btn btn-ghost !min-h-12 text-sm">
             <PackageCheck size={18} />Receive J-1042 back (238.400 g + 7.100 g scrap)
           </button>
         </div>
         <div className="scroll-x mt-3">
-          <table className="w-full min-w-[820px] text-sm">
+          <table className="w-full min-w-[900px] text-sm [&_td]:whitespace-nowrap [&_td]:py-2.5">
             <thead><tr className="border-b border-line text-left text-xs uppercase tracking-wide text-ink-3">{["Job", "Karigar", "Item", "Issued", "Finished", "Scrap", "Loss", "Cap", "Excess", "Fairness", ""].map((h) => <th key={h} className="px-2 py-2 font-bold">{h}</th>)}</tr></thead>
             <tbody>
               {jobs.slice().reverse().map((j) => {

@@ -99,14 +99,14 @@ export default function Shell({ children }: { children: ReactNode }) {
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-line/70 bg-ivory/80 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4">
-          <Link href="/" className="flex items-center gap-2" aria-label="Tarazu home">
+        <div className="mx-auto flex h-16 max-w-[1560px] items-center gap-3 px-4 sm:px-6 2xl:h-[72px]">
+          <Link href="/" className="flex shrink-0 items-center gap-2" aria-label="Tarazu home">
             <Image src="/assets/logo-tarazu.svg" alt="" width={40} height={40} priority />
             <span className="font-display text-2xl font-semibold tracking-tight">Tarazu</span>
           </Link>
-          <nav className="ml-4 hidden items-center gap-0.5 xl:flex" aria-label="Main">
+          <nav className="ml-6 hidden min-w-0 items-center gap-0.5 xl:flex 2xl:ml-10 2xl:gap-1.5" aria-label="Main">
             {NAV.map((n) => (
-              <Link key={n.href} href={n.href} className={`flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-full px-3 text-sm font-bold transition ${active(n.href) ? "bg-ink text-ivory" : "text-ink-2 hover:bg-ink/5"}`}>
+              <Link key={n.href} href={n.href} className={`flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 text-[13px] font-bold transition 2xl:px-3.5 2xl:text-[15px] ${active(n.href) ? "bg-ink text-ivory" : "text-ink-2 hover:bg-ink/5"}`}>
                 <n.icon size={16} />{t(n.label)}
               </Link>
             ))}
@@ -123,7 +123,7 @@ export default function Shell({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <main className="mx-auto min-h-[70vh] max-w-7xl px-4 pb-40 pt-6 xl:pb-24">
+      <main className="mx-auto min-h-[70vh] max-w-[1560px] px-4 pb-40 pt-6 sm:px-6 xl:pb-24">
         {ready ? children : (
           <div className="grid min-h-[60vh] place-items-center">
             <div className="text-center"><Image src="/assets/logo-tarazu.svg" alt="" width={84} height={84} className="floaty mx-auto" /><p className="mt-3 font-semibold text-ink-3">Opening the book…</p></div>
@@ -132,7 +132,7 @@ export default function Shell({ children }: { children: ReactNode }) {
       </main>
 
       {/* phone tab bar: four big targets + More */}
-      <nav className="safe-b fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 backdrop-blur xl:hidden" aria-label="Main">
+      <nav className={`safe-b fixed inset-x-0 bottom-0 border-t ${more ? "z-[55]" : "z-40"} border-line bg-paper/95 backdrop-blur xl:hidden`} aria-label="Main">
         <div className="mx-auto grid max-w-lg grid-cols-5">
           {tabs.map((n) => (
             <Link key={n.href} href={n.href} className={`flex min-h-[68px] flex-col items-center justify-center gap-1 text-[12px] font-bold ${active(n.href) ? "text-bahi" : "text-ink-3"}`}>
@@ -145,7 +145,7 @@ export default function Shell({ children }: { children: ReactNode }) {
         </div>
         <AnimatePresence>
           {more && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} className="card absolute inset-x-3 bottom-[80px] grid grid-cols-2 gap-2 bg-paper p-3">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} className="card absolute inset-x-3 bottom-[80px] grid grid-cols-2 gap-2 !bg-[#fbf8f1] p-3 shadow-2xl">
               {rest.map((n) => (
                 <Link key={n.href} href={n.href} className={`flex min-h-14 items-center gap-3 rounded-2xl px-4 font-bold ${active(n.href) ? "bg-ink text-ivory" : "bg-ivory-2/70"}`}><n.icon size={22} />{t(n.label)}</Link>
               ))}

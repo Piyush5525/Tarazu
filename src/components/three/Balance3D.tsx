@@ -102,8 +102,8 @@ function Scale({ tilt = 0, leftBeads = 5, rightBeads = 5, onPan, alert }: Balanc
     right.current.position.set(Math.cos(s.a) * ARM, Math.sin(s.a) * ARM - DROP, 0);
     left.current.rotation.z = sway; right.current.rotation.z = -sway;
     // the whole instrument leans a little toward the pointer / finger
-    root.current.rotation.y = THREE.MathUtils.lerp(root.current.rotation.y, state.pointer.x * 0.45, 0.06);
-    root.current.rotation.x = THREE.MathUtils.lerp(root.current.rotation.x, -state.pointer.y * 0.12, 0.06);
+    root.current.rotation.y = THREE.MathUtils.lerp(root.current.rotation.y, state.pointer.x * 0.16, 0.06);
+    root.current.rotation.x = THREE.MathUtils.lerp(root.current.rotation.x, -state.pointer.y * 0.06, 0.06);
   });
 
   const tap = (side: "left" | "right") => (e: ThreeEvent<PointerEvent>) => { e.stopPropagation(); onPan?.(side); };

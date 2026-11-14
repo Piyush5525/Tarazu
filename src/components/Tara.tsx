@@ -57,6 +57,9 @@ export default function Tara() {
   const [nudge, setNudge] = useState(false);
   const [live, setLive] = useState(false);
   const [earOn, setEarOn] = useState(false);
+  // On a phone the chat is full-screen, so when she takes you somewhere it shrinks to a small bar and the page shows.
+  const [mini, setMini] = useState(false);
+  const guide = () => { if (typeof window !== "undefined" && window.innerWidth < 768) setMini(true); };
 
   const stopMic = useRef<() => void>(noop);
   const ear = useRef<EarCtl | null>(null);
@@ -124,6 +127,7 @@ export default function Tara() {
     if (r.setLang) { setLang(r.setLang); hearLang.current = r.setLang; }
     if (r.go && (r.go.includes("?") || r.go !== ctx.current.path)) router.push(r.go);
     if (r.spot) setTimeout(() => spotlight(r.spot), 600);
+    if (r.go || r.spot || r.tour) guide();
     say(r.say, r.setLang ?? l, r.tour ? () => runTour(0) : undefined);
   }, [router, say, setLang, runTour]);
 
@@ -158,7 +162,7 @@ export default function Tara() {
       if (data.say && groundingGuard(toAsciiDigits(data.say), allowed).ok) {
         const rl = data.lang ?? l;
         if (rl !== l) { hearLang.current = rl; setLang(rl); }
-        if (data.go && data.go !== ctx.current.path) router.push(data.go);
+        if (data.go && data.go !== ctx.current.path) { router.push(data.go); guide(); }
         say(data.say, rl, undefined, true);
         return;
       }
@@ -239,7 +243,7 @@ export default function Tara() {
   const toggle = () => {
     setNudge(false);
     if (open) { stopSpeaking(); stopMic.current(); tourRef.current = -1; convoUntil.current = 0; setMood("idle"); setOpen(false); ear.current?.resume(); return; }
-    setOpen(true); ctx.current.open = true;
+    setOpen(true); setMini(false); ctx.current.open = true;
     if (!msgs.length) say(tr(lang, HELLO), lang);
   };
 
@@ -273,10 +277,24 @@ export default function Tara() {
         </motion.button>
       </div>
 
+      {/* phone only: the small bar she speaks from while showing you a screen */}
+      <AnimatePresence>
+        {open && mini && (
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 30 }} className="fixed inset-x-2 bottom-[78px] z-[56] flex items-center gap-2 rounded-[22px] border border-gold/60 bg-ink p-2 pr-2 text-ivory shadow-2xl md:hidden">
+            <button onClick={() => setMini(false)} className="flex min-w-0 flex-1 items-center gap-2 text-left" aria-label={t({ en: "Open the full chat", hi: "पूरी बातचीत खोलो", bn: "পুরো কথা খোলো" })}>
+              <span className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full" style={{ background: "radial-gradient(circle at 35% 25%, #fffaf0, #e6c56e)", boxShadow: "0 0 0 2px #c9a24b" }}><TaraAvatar mood={mood} className="h-full w-full" /></span>
+              <span className="line-clamp-3 min-w-0 flex-1 text-[14px] leading-snug">{heard.trim() ? heard + "…" : msgs.filter((m) => m.from === "tara").slice(-1)[0]?.text ?? status}</span>
+            </button>
+            <button onClick={mic} aria-label={t({ en: "Press and speak", hi: "दबाओ और बोलो", bn: "টিপে বলো" })} className={`grid h-12 w-12 shrink-0 place-items-center rounded-full text-white ${micLive ? "bg-terracotta" : "bg-verdigris"}`}>{micLive ? <span className="wave scale-75"><i /><i /><i /></span> : <Mic size={22} />}</button>
+            <button onClick={toggle} aria-label="Close" className="grid h-12 w-10 shrink-0 place-items-center rounded-full bg-white/10"><X size={20} /></button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <AnimatePresence>
         {open && (
           <motion.div role="dialog" aria-label="Tara" initial={{ opacity: 0, y: 40, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 40, scale: 0.96 }} transition={{ type: "spring", stiffness: 260, damping: 26 }}
-            className="fixed inset-0 z-[60] flex h-dvh flex-col overflow-hidden bg-paper shadow-2xl md:inset-auto md:bottom-[200px] md:right-6 md:z-50 xl:bottom-[140px] md:h-[620px] md:max-h-[calc(100vh-230px)] xl:max-h-[calc(100vh-170px)] md:w-[400px] md:rounded-[26px] md:border md:border-line">
+            className={`fixed inset-0 z-[60] h-dvh flex-col overflow-hidden bg-paper shadow-2xl md:flex ${mini ? "hidden" : "flex"} md:inset-auto md:bottom-[200px] md:right-6 md:z-50 xl:bottom-[140px] md:h-[620px] md:max-h-[calc(100vh-230px)] xl:max-h-[calc(100vh-170px)] md:w-[400px] md:rounded-[26px] md:border md:border-line`}>
             <div className="relative flex items-center gap-3 px-4 py-3 text-ivory" style={{ background: "linear-gradient(135deg,#2a2018,#15130F 60%)" }}>
               <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full" style={{ background: "radial-gradient(circle at 35% 25%, #fffaf0, #e6c56e)", boxShadow: "0 0 0 2px #c9a24b" }}>
                 <TaraAvatar mood={mood} className="h-full w-full scale-[1.18] translate-y-[6%]" />
