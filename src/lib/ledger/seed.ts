@@ -20,6 +20,22 @@ export const DESIGN_CLASSES: Record<string, string> = {
 
 export const DAY = 86_400_000;
 
+/** Jewellery names as a karigar would say them, so a Hindi or Bengali voice reads them naturally. */
+const ITEM_NAMES: Record<string, { hi: string; bn: string }> = {
+  "Bridal haar + earrings": { hi: "ब्राइडल हार और झुमके", bn: "ব্রাইডাল হার আর দুল" },
+  "Baby kada": { hi: "बच्चे का कड़ा", bn: "বাচ্চার বালা" },
+  "Nath": { hi: "नथ", bn: "নথ" },
+  "Jhumka pair": { hi: "झुमकों की जोड़ी", bn: "ঝুমকো জোড়া" },
+  "Mangalsutra": { hi: "मंगलसूत्र", bn: "মঙ্গলসূত্র" },
+  "Bangles (set of 6)": { hi: "चूड़ियाँ (6 का सेट)", bn: "চুড়ি (6টার সেট)" },
+  "Choker set": { hi: "चोकर सेट", bn: "চোকার সেট" },
+  "Temple haar": { hi: "टेम्पल हार", bn: "টেম্পল হার" },
+  "Rani haar": { hi: "रानी हार", bn: "রানি হার" },
+  "Kada pair": { hi: "कड़ों की जोड़ी", bn: "বালা জোড়া" },
+  "Cocktail ring": { hi: "कॉकटेल अंगूठी", bn: "ককটেল আংটি" },
+};
+export const itemName = (item: string, lang: "en" | "hi" | "bn") => (lang === "en" ? item : ITEM_NAMES[item]?.[lang] ?? item);
+
 // z(q) via a logistic approximation of the normal quantile: good to a few percent, and exactly 0 at the median.
 const z = (q: number) => Math.log(q / (1 - q)) / 1.702;
 

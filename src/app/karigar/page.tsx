@@ -9,7 +9,7 @@ import { useFacts } from "@/lib/facts";
 import { tr, useT, type L } from "@/lib/i18n";
 import { findDivergence, type Divergence } from "@/lib/ledger/analytics";
 import { reconcile, type LedgerEvent } from "@/lib/ledger/engine";
-import { KARIGARS } from "@/lib/ledger/seed";
+import { itemName, KARIGARS } from "@/lib/ledger/seed";
 import { fineMg, grams, pct, rupees } from "@/lib/ledger/units";
 import { useStore, type Lang } from "@/lib/store";
 import { canListen, listen, NO_WORDS, readIssue, speak, YES_WORDS } from "@/lib/voice";
@@ -87,9 +87,9 @@ function VoiceCapture() {
     if (h.purityBp === null) return bot(t({ en: `I heard ${grams(h.netMg)} grams, but not the carat. Is it 22 carat or 18 carat? Say it again with the carat.`, hi: `मैंने ${grams(h.netMg)} ग्राम सुना, पर कैरेट नहीं। 22 कैरेट या 18 कैरेट? कैरेट के साथ दोबारा बोलो।`, bn: `আমি ${grams(h.netMg)} গ্রাম শুনেছি, কিন্তু ক্যারেট শুনিনি। ২২ না ১৮ ক্যারেট? ক্যারেটসহ আবার বলো।` }));
     const pure = fineMg(h.netMg, h.purityBp);
     bot(t({
-      en: `I heard: you received ${grams(h.netMg)} grams of ${h.karat} carat gold for ${target.item}, job ${target.id}. That is ${grams(pure)} grams of pure gold. Is this correct?`,
-      hi: `मैंने सुना: ${target.item}, काम ${target.id} के लिए तुम्हें ${grams(h.netMg)} ग्राम ${h.karat} कैरेट सोना मिला। यानी ${grams(pure)} ग्राम खरा सोना। क्या यह सही है?`,
-      bn: `আমি শুনলাম: ${target.item}, কাজ ${target.id}-এর জন্য তুমি ${grams(h.netMg)} গ্রাম ${h.karat} ক্যারেট সোনা পেয়েছ। মানে ${grams(pure)} গ্রাম খাঁটি সোনা। এটা কি ঠিক?`,
+      en: `I heard: you received ${grams(h.netMg)} grams of ${h.karat} carat gold for ${itemName(target.item, "en")}, job ${target.id}. That is ${grams(pure)} grams of pure gold. Is this correct?`,
+      hi: `मैंने सुना: ${itemName(target.item, "hi")}, काम ${target.id} के लिए तुम्हें ${grams(h.netMg)} ग्राम ${h.karat} कैरेट सोना मिला। यानी ${grams(pure)} ग्राम खरा सोना। क्या यह सही है?`,
+      bn: `আমি শুনলাম: ${itemName(target.item, "bn")}, কাজ ${target.id}-এর জন্য তুমি ${grams(h.netMg)} গ্রাম ${h.karat} ক্যারেট সোনা পেয়েছ। মানে ${grams(pure)} গ্রাম খাঁটি সোনা। এটা কি ঠিক?`,
     }), { draft: { netMg: h.netMg, purityBp: h.purityBp, jobId: target.id } });
   };
 
@@ -318,7 +318,7 @@ function Book() {
               const r = reconcile(j, chain);
               return (
                 <div key={j.id} className="rounded-2xl border border-line bg-white/70 p-4">
-                  <div className="flex items-center justify-between gap-2"><span className="font-bold">{j.item}</span><span className={`chip ${j.status === "OPEN" ? "chip-gold" : j.status === "SETTLED" ? "chip-ok" : "chip-warn"}`}>{j.status === "OPEN" ? t({ en: "Working", hi: "चालू", bn: "চলছে" }) : j.status === "SETTLED" ? t({ en: "Closed", hi: "पूरा", bn: "শেষ" }) : t({ en: "To settle", hi: "हिसाब बाक़ी", bn: "হিসাব বাকি" })}</span></div>
+                  <div className="flex items-center justify-between gap-2"><span className="font-bold">{itemName(j.item, lang)}</span><span className={`chip ${j.status === "OPEN" ? "chip-gold" : j.status === "SETTLED" ? "chip-ok" : "chip-warn"}`}>{j.status === "OPEN" ? t({ en: "Working", hi: "चालू", bn: "চলছে" }) : j.status === "SETTLED" ? t({ en: "Closed", hi: "पूरा", bn: "শেষ" }) : t({ en: "To settle", hi: "हिसाब बाक़ी", bn: "হিসাব বাকি" })}</span></div>
                   <div className="num text-xs text-ink-3">{j.id}</div>
                   <div className="mt-2 grid grid-cols-3 gap-1 text-center text-xs font-semibold text-ink-2">
                     <span>{t({ en: "Got", hi: "मिला", bn: "পেলে" })}<br /><Grams mg={r.issuedFine} className="text-sm text-ink" unit={false} /></span>

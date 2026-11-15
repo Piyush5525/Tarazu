@@ -30,6 +30,14 @@ Limits to know: speech recognition must be told a language before it listens, so
 - Hero: floating signature cards around the scale (wide screens), live figures strip.
 - Re-ran the scripted demo path: 14/14, no page errors.
 
+## Fourth pass (2026-11-15)
+
+- Agent Room conversation, labels and read-back now in Hindi / Bengali / English; Shop table headings, pending-entry lines, deadline card and notes translated. Jewellery names have local forms, so a Hindi or Bengali voice reads them naturally.
+- Voice logic tested with a simulated microphone and speaker (browser speech APIs replaced by test doubles): 22/22 — wake word from another screen, answer + navigation, follow-up without the name, "say it again", "speak slowly", English and Bengali switching, ordinary talk ignored, ear on/off, read-back then spoken "haan" signs and "nahi" cancels, missing carat asked not guessed, demo pause silences narration, read-to-me on each screen.
+- Phone walkthrough: 360 px Hindi 30/30; 412 px English 29/30 (the one miss was a timing artefact while Tara's panel animated open; the screenshot right after shows it full-screen). Desktop demo path 14/14. Unit tests 13/13. No page errors in any run.
+
+What the simulated test cannot show: real recognition accuracy (accents, noise, Bengali support on a given phone), whether the device has a Hindi/Bengali voice installed, and the browser's microphone permission prompt.
+
 ## Not verified
 
 - Real microphone input and spoken output (headless browser has neither). The code paths are the standard Web Speech API; test on the demo phone in Chrome. Bengali voice availability depends on the device.
