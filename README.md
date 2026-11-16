@@ -73,7 +73,7 @@ straight away. Agents look for gaps and propose fixes, but people make every dec
 ### One entry, from voice to the chain
 
 ```mermaid
-flowchart LR
+flowchart TD
     A(["Karigar speaks<br/>'250 g, 22 carat'"]) --> B["Speech to text<br/>(browser, free)"]
     B --> C{"Weight and carat<br/>both heard?"}
     C -- "no" --> D["Tara asks again<br/>never guesses"] --> A
@@ -115,23 +115,23 @@ stateDiagram-v2
 ```mermaid
 sequenceDiagram
     autonumber
-    actor K as Karigar (Bablu)
-    participant D as Divergence finder
-    participant S as Steward agent
-    participant A as Advocate agent
-    participant M as Mediator agent
+    actor K as Karigar
+    participant D as Finder
+    participant S as Steward
+    participant A as Advocate
+    participant M as Mediator
     actor J as Jeweller
 
     K->>D: "My count is different"
-    D-->>K: J-1019 return: ledger 118.250 g, his book 118.520 g
-    S->>M: Loss is within the agreed cap
-    A->>M: Bablu's book matches every other entry
-    M->>M: Fair band from past jobs of the same kind (P10 / P50 / P90)
+    D-->>K: J-1019: ledger 118.250 g, his book 118.520 g
+    S->>M: Loss is within the cap
+    A->>M: His book matches the rest
+    M->>M: Fair band P10 / P50 / P90
     M-->>K: Proposal at the median, read aloud
     M-->>J: Same proposal, same numbers
     K->>J: Signs
     J->>K: Signs
-    Note over K,J: ADJUSTMENT event, FINAL only with both signatures.<br/>Agents propose, people decide.
+    Note over K,J: ADJUSTMENT is FINAL only with both signatures. Agents propose, people decide.
 ```
 
 ### Architecture
