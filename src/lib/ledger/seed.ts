@@ -4,12 +4,12 @@ import { PURITY, rng } from "./units";
 
 // Everything here is seeded DEMO data. Rates, wastage norms and stage times are config values, not field facts.
 
-export type Karigar = { id: string; name: string; nameLocal: string; lang: "bn" | "hi"; city: string; since: number; tier: string };
+export type Karigar = { id: string; name: string; nameLocal: string; names: { hi: string; bn: string }; lang: "bn" | "hi"; city: string; since: number; tier: string };
 
 export const KARIGARS: Karigar[] = [
-  { id: "bablu", name: "Bablu Maity", nameLocal: "বাবলু মাইতি", lang: "bn", city: "Medinipur → Jaipur", since: 2011, tier: "Master" },
-  { id: "rafiq", name: "Rafiq Ali", nameLocal: "रफ़ीक़ अली", lang: "hi", city: "Jaipur", since: 2015, tier: "Senior" },
-  { id: "suresh", name: "Suresh Soni", nameLocal: "सुरेश सोनी", lang: "hi", city: "Jaipur", since: 2018, tier: "Senior" },
+  { id: "bablu", name: "Bablu Maity", nameLocal: "বাবলু মাইতি", names: { hi: "बबलू माइती", bn: "বাবলু মাইতি" }, lang: "bn", city: "Medinipur → Jaipur", since: 2011, tier: "Master" },
+  { id: "rafiq", name: "Rafiq Ali", nameLocal: "रफ़ीक़ अली", names: { hi: "रफ़ीक़ अली", bn: "রফিক আলি" }, lang: "hi", city: "Jaipur", since: 2015, tier: "Senior" },
+  { id: "suresh", name: "Suresh Soni", nameLocal: "सुरेश सोनी", names: { hi: "सुरेश सोनी", bn: "সুরেশ সোনি" }, lang: "hi", city: "Jaipur", since: 2018, tier: "Senior" },
 ];
 
 export const DESIGN_CLASSES: Record<string, string> = {

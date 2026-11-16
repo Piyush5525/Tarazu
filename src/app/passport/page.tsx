@@ -84,7 +84,7 @@ export default function PassportPage() {
                 <div className="flip-face absolute inset-0 overflow-hidden rounded-[24px] p-6 text-ink shadow-2xl" style={{ background: "linear-gradient(135deg,#f4dc95 0%,#d2a94e 45%,#9c7220 100%)" }}>
                   <div className="shimmer absolute inset-0 opacity-60" />
                   <div className="relative flex items-center justify-between"><span className="font-display text-xl font-semibold">Tarazu · Trust Passport</span><Image src="/assets/logo-tarazu.svg" alt="" width={44} height={44} /></div>
-                  <div className="relative mt-8 font-display text-3xl font-semibold">{lang === "en" ? f.who.name : f.who.nameLocal}</div>
+                  <div className="relative mt-8 font-display text-3xl font-semibold">{lang === "en" ? f.who.name : f.who.names[lang]}</div>
                   <div className="relative text-sm font-semibold opacity-80">{f.who.tier} karigar · since {f.who.since} · {f.who.city}</div>
                   <div className="num relative mt-6 flex items-end justify-between text-xs font-bold"><span>ID {cred.id}</span><span className="inline-flex items-center gap-1"><RotateCw size={13} />{t({ en: "tap to flip", hi: "पलटने के लिए छुओ", bn: "উল্টাতে ছোঁও" })}</span></div>
                 </div>

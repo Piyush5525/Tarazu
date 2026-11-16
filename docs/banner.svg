@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 420" width="1280" height="420" role="img" aria-label="Tarazu: the gold ledger both sides sign">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1b1510"/>
+      <stop offset="1" stop-color="#2b2016"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f3d58a"/>
+      <stop offset=".5" stop-color="#c9973a"/>
+      <stop offset="1" stop-color="#8a5f1c"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".72" cy=".45" r=".5">
+      <stop offset="0" stop-color="#c9973a" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#c9973a" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="lines" width="40" height="28" patternUnits="userSpaceOnUse">
+      <path d="M0 27.5H40" stroke="#f3d58a" stroke-opacity=".05"/>
+    </pattern>
+  </defs>
+  <rect width="1280" height="420" rx="24" fill="url(#bg)"/>
+  <rect width="1280" height="420" rx="24" fill="url(#lines)"/>
+  <rect width="1280" height="420" rx="24" fill="url(#glow)"/>
+  <path d="M96 0V420" stroke="#b23a2a" stroke-opacity=".45"/>
+
+  <!-- floating gold dust -->
+  <g fill="#f3d58a">
+    <circle cx="700" cy="90" r="2"><animate attributeName="cy" values="90;70;90" dur="6s" repeatCount="indefinite"/></circle>
+    <circle cx="1180" cy="120" r="1.6"><animate attributeName="cy" values="120;96;120" dur="7s" repeatCount="indefinite"/></circle>
+    <circle cx="820" cy="340" r="2.2"><animate attributeName="cy" values="340;318;340" dur="5s" repeatCount="indefinite"/></circle>
+    <circle cx="1100" cy="330" r="1.4"><animate attributeName="cy" values="330;306;330" dur="8s" repeatCount="indefinite"/></circle>
+  </g>
+
+  <!-- the balance -->
+  <g transform="translate(940 70)">
+    <rect x="-6" y="40" width="12" height="230" rx="6" fill="#0d0a07"/>
+    <ellipse cx="0" cy="282" rx="86" ry="16" fill="url(#gold)"/>
+    <circle cx="0" cy="22" r="13" fill="none" stroke="url(#gold)" stroke-width="5"/>
+    <g>
+      <animateTransform attributeName="transform" type="rotate" values="-5 0 50;5 0 50;-5 0 50" dur="6s" repeatCount="indefinite"/>
+      <rect x="-190" y="46" width="380" height="8" rx="4" fill="url(#gold)"/>
+      <circle cx="0" cy="50" r="18" fill="url(#gold)"/>
+      <g transform="translate(-180 54)">
+        <path d="M0 0L-52 120M0 0L52 120" stroke="#e8d3a6" stroke-opacity=".7" stroke-width="2"/>
+        <path d="M-70 120h140a70 30 0 0 1-140 0z" fill="url(#gold)"/>
+      </g>
+      <g transform="translate(180 54)">
+        <path d="M0 0L-52 120M0 0L52 120" stroke="#e8d3a6" stroke-opacity=".7" stroke-width="2"/>
+        <path d="M-70 120h140a70 30 0 0 1-140 0z" fill="url(#gold)"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- words -->
+  <text x="140" y="118" font-family="Georgia, 'Times New Roman', serif" font-size="22" fill="#e8b4a6" letter-spacing="2">दोनों साक्षी · দুই সাক্ষী · BOTH WITNESSES</text>
+  <text x="136" y="210" font-family="Georgia, 'Times New Roman', serif" font-size="104" font-weight="700" fill="url(#gold)">Tarazu</text>
+  <text x="140" y="262" font-family="Georgia, 'Times New Roman', serif" font-size="34" fill="#f6efe2">The gold ledger <tspan font-style="italic" fill="#f3d58a">both sides sign.</tspan></text>
+  <text x="140" y="306" font-family="'Segoe UI', Helvetica, Arial, sans-serif" font-size="19" fill="#cbbfa8">Co-signed entries · tamper-evident chain · voice in Hindi, Bengali, English</text>
+  <g font-family="'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="600">
+    <rect x="140" y="336" width="128" height="34" rx="17" fill="#f3d58a" fill-opacity=".12" stroke="#f3d58a" stroke-opacity=".4"/>
+    <text x="204" y="358" text-anchor="middle" fill="#f3d58a">Voice first</text>
+    <rect x="280" y="336" width="150" height="34" rx="17" fill="#f3d58a" fill-opacity=".12" stroke="#f3d58a" stroke-opacity=".4"/>
+    <text x="355" y="358" text-anchor="middle" fill="#f3d58a">Two signatures</text>
+    <rect x="442" y="336" width="128" height="34" rx="17" fill="#f3d58a" fill-opacity=".12" stroke="#f3d58a" stroke-opacity=".4"/>
+    <text x="506" y="358" text-anchor="middle" fill="#f3d58a">No paid APIs</text>
+  </g>
+</svg>

@@ -258,7 +258,7 @@ function Book() {
         <span className="chip chip-ok"><ShieldCheck size={14} />{t({ en: "Only your own account", hi: "सिर्फ़ तुम्हारा अपना खाता", bn: "শুধু তোমার নিজের খাতা" })}</span>
       </div>
 
-      <h1 className="text-3xl font-semibold sm:text-4xl">{t({ en: "Hello", hi: "नमस्ते", bn: "নমস্কার" })}, <span className="gold-text">{lang === "en" ? f.who.name.split(" ")[0] : f.who.nameLocal.split(" ")[0]}</span></h1>
+      <h1 className="text-3xl font-semibold sm:text-4xl">{t({ en: "Hello", hi: "नमस्ते", bn: "নমস্কার" })}, <span className="gold-text">{lang === "en" ? f.who.name.split(" ")[0] : f.who.names[lang].split(" ")[0]}</span></h1>
       <div className="mb-4 mt-2"><Speak text={summary} /></div>
       <Guide steps={[
         { en: "Look at the big gold number: that is the gold with you.", hi: "बड़ा सुनहरा अंक देखो: इतना सोना तुम्हारे पास है।", bn: "বড় সোনালি সংখ্যাটা দেখো: এতটা সোনা তোমার কাছে।" },
